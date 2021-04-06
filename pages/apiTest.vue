@@ -3,7 +3,7 @@
     <v-card
     class="d-inline-flex flex-column align-center pa-5"
     outlined
-    style="min-width: 400px"
+    style="min-width: 600px"
     >
       <h1>/test</h1>
       <v-text-field
@@ -18,7 +18,7 @@
     <v-card
       class="d-inline-flex flex-column align-center pa-5"
       outlined
-      style="min-width: 400px"
+      style="width: 600px"
     >
       <h1>/api/specific-text</h1>
       <v-text-field
@@ -27,7 +27,7 @@
         style="width: 300px"
       />
       <v-btn @click="apiSpecificTextCall">Submit</v-btn>
-      <h1>{{ apiSpecificTextResult }}</h1>
+      <p>{{ apiSpecificTextResult }}</p>
     </v-card>
   </v-container>
 </template>
@@ -50,7 +50,7 @@ export default {
     },
     async apiSpecificTextCall() {
       let response = await this.$axios.$get('/api/specific-text?text=' + this.apiSpecificTextInput)
-      this.apiSpecificTextResult = response.data;
+      this.apiSpecificTextResult = response;
       console.log(this.apiSpecificTextResult);
     }
   }

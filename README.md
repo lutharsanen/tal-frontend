@@ -1,4 +1,8 @@
 # tal-frontend
+- start backend
+- start python server for dataset...cd to 'Dataset\videos\videos' in cmd, then call "python -m http.server 3001"...
+- call npm install
+- call npm run dev
 
 ## Build Setup
 

@@ -26,7 +26,7 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: [{ src: '~/plugins/vue-plyr', mode: 'client' }],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -42,6 +42,11 @@ export default {
 
   axios: {
     baseURL: 'http://127.0.0.1:8000'
+  },
+
+  env: {
+    API_URL: 'http://localhost:8000',
+    VIDEO_SOURCE_URL: 'http://localhost:3001',
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

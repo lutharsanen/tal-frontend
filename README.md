@@ -1,6 +1,7 @@
 # tal-frontend
-- start backend
-- start python server for dataset...cd to 'Dataset\videos\videos' in cmd, then call "python -m http.server 3001"...
+- start backend on port 8000 (does this by default)
+- start python server for dataset...cd inside 'Dataset' just before '/videos' in cmd, then call "python -m http.server 3001"
+    - I stored the top 10 videos in a separate test folder on my computer. (inside the videos/videos folder structure still)
 - call npm install
 - call npm run dev
 

@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container style="width: 1900px">
     <v-row>
       <v-col md="3" class="text-center">
         <v-select
@@ -23,9 +23,6 @@
           label="Select Response Video"
           @input="submitVideoNum"
         />
-        <div style="margin: 2rem">{{currentTimestamp}} s</div>
-        <v-btn @click="getCurrentTime">Get Timestamp</v-btn>
-        <v-btn @click="finalSubmission">Submit</v-btn>
       </v-col>
       <v-col id="vue-plyrLocalhost" class="text-center">
         <vue-plyr ref="plyr">
@@ -48,7 +45,12 @@
             />
           </video>
         </vue-plyr>
-        <v-btn @click="testMethod">Test Button</v-btn>
+        <!--v-btn @click="testMethod">Test Button</v-btn-->
+      </v-col>
+      <v-col>
+        <div style="margin: 2rem">{{currentTimestamp}} s</div>
+        <v-btn @click="getCurrentTime">Get Timestamp</v-btn>
+        <v-btn @click="finalSubmission">Submit</v-btn>
       </v-col>
     </v-row>
     <v-row class="text-center"></v-row>

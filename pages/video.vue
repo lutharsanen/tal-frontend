@@ -12,7 +12,11 @@
           v-model="textInput"
           label="Input Text"
         />
-        <v-btn @click="searchText(textInput)">Search</v-btn>
+        <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
+        <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
+        <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
+        <!--v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox-->
+        <v-btn @click="searchText">Search</v-btn>
         <v-select
           v-model="videoNum"
           :items="queryResponseItems"
@@ -47,9 +51,15 @@
         <v-btn @click="testMethod">Test Button</v-btn>
       </v-col>
     </v-row>
-    <v-row class="text-center">
-
-    </v-row>
+    <v-row class="text-center"></v-row>
+    <v-snackbar
+      v-model="showSnackbar"
+      timeout="2500"
+      color="blue"
+      bottom
+    >
+      {{ snackbarText }}
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -73,7 +83,12 @@ export default {
     videoNum: '00032',
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/videos/00032/00032.mp4',
     currentTimestamp: 0,
-    apiSpecificTextResult: '',
+    searchByVideoText: false,
+    searchByDescription: false,
+    searchByTitle: false,
+    searchByTag: false,
+    showSnackbar: false,
+    snackbarText: '',
     lessItems: ['00032','00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192',],
     queryResponseItems: []
   }),
@@ -86,16 +101,40 @@ export default {
       this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
     },
     async searchText() {
-      let response = await this.$axios.$get('/api/specific-text?text=' + this.textInput)
-      this.apiSpecificTextResult = response;
+      if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
+        this.snackbarText = "Please select a query."
+        this.showSnackbar = true
+      }
       this.queryResponseItems = [];
+      if (this.searchByVideoText) {
+        let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
+        console.log('SearchByVideoText: ', response1)
+        this.addVideoToList(response1)
+      }
+      if (this.searchByDescription) {
+        let response2 = await this.$axios.$get('/api/searchByDescription?text=' + this.textInput)
+        console.log('SearchByDescription: ', response2)
+        this.addVideoToList(response2)
+      }
+      if (this.searchByTitle) {
+        let response3 = await this.$axios.$get('/api/searchByTitle?text=' + this.textInput)
+        console.log('SearchByTitle: ', response3)
+        this.addVideoToList(response3)
+      }
+      if (this.searchByTag) {
+        let response4 = await this.$axios.$get('/api/searchByTag?text=' + this.textInput)
+        console.log('SearchByTag: ', response4)
+        this.addVideoToList(response4)
+      }
+      console.log(this.queryResponseItems);
+    },
+    addVideoToList(response) {
       for (let i=0; i < response.results.length; i++) {
         console.log(response.results[i].video_id)
-        var s = response.results[i].video_id+"";
+        var s = response.results[i].video_id ? response.results[i].video_id+"" : response.results[i].id+"";
         while (s.length < 5) s = "0" + s;
         if (!this.queryResponseItems.includes(s)) this.queryResponseItems = this.queryResponseItems.concat(s);
       }
-      console.log(this.queryResponseItems);
     },
     updateVideo() {
       this.$refs.plyr.player.source = {

@@ -15,7 +15,7 @@
         <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
         <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
         <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
-        <!--v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox-->
+        <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
         <v-btn @click="searchText">Search</v-btn>
         <v-select
           v-model="videoNum"
@@ -57,7 +57,7 @@
     <v-snackbar
       v-model="showSnackbar"
       timeout="2500"
-      color="blue"
+      :color="snackbarColor"
       bottom
     >
       {{ snackbarText }}
@@ -91,6 +91,7 @@ export default {
     searchByTag: false,
     showSnackbar: false,
     snackbarText: '',
+    snackbarColor: 'blue',
     lessItems: ['00032','00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192',],
     queryResponseItems: []
   }),
@@ -105,30 +106,43 @@ export default {
     async searchText() {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
         this.snackbarText = "Please select a query."
+        this.snackbarColor = 'red'
         this.showSnackbar = true
       }
-      this.queryResponseItems = [];
-      if (this.searchByVideoText) {
-        let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
-        console.log('SearchByVideoText: ', response1)
-        this.addVideoToList(response1)
+      else {
+        this.queryResponseItems = [];
+        if (this.searchByVideoText) {
+          let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
+          console.log('SearchByVideoText: ', response1)
+          this.addVideoToList(response1)
+        }
+        if (this.searchByDescription) {
+          let response2 = await this.$axios.$get('/api/searchByDescription?text=' + this.textInput)
+          console.log('SearchByDescription: ', response2)
+          this.addVideoToList(response2)
+        }
+        if (this.searchByTitle) {
+          let response3 = await this.$axios.$get('/api/searchByTitle?text=' + this.textInput)
+          console.log('SearchByTitle: ', response3)
+          this.addVideoToList(response3)
+        }
+        if (this.searchByTag) {
+          let response4 = await this.$axios.$get('/api/searchByTag?text=' + this.textInput)
+          console.log('SearchByTag: ', response4)
+          this.addVideoToList(response4)
+        }
+        console.log(this.queryResponseItems);
+        if (this.queryResponseItems.length > 0) {
+          this.snackbarText = "Success! Select a video."
+          this.snackbarColor = 'green'
+          this.showSnackbar = true
+        }
+        else {
+          this.snackbarText = "No results."
+          this.snackbarColor = 'blue'
+          this.showSnackbar = true
+        }
       }
-      if (this.searchByDescription) {
-        let response2 = await this.$axios.$get('/api/searchByDescription?text=' + this.textInput)
-        console.log('SearchByDescription: ', response2)
-        this.addVideoToList(response2)
-      }
-      if (this.searchByTitle) {
-        let response3 = await this.$axios.$get('/api/searchByTitle?text=' + this.textInput)
-        console.log('SearchByTitle: ', response3)
-        this.addVideoToList(response3)
-      }
-      if (this.searchByTag) {
-        let response4 = await this.$axios.$get('/api/searchByTag?text=' + this.textInput)
-        console.log('SearchByTag: ', response4)
-        this.addVideoToList(response4)
-      }
-      console.log(this.queryResponseItems);
     },
     addVideoToList(response) {
       for (let i=0; i < response.results.length; i++) {

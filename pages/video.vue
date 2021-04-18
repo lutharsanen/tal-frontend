@@ -1,5 +1,5 @@
 <template>
-  <v-container style="width: 1900px">
+  <v-container style="max-width: 100%">
     <v-row>
       <v-col md="3" class="text-center">
         <v-select
@@ -18,13 +18,19 @@
         <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
         <v-btn @click="searchText">Search</v-btn>
         <v-select
-          v-model="videoNum"
+          v-model="itemIndex"
           :items="queryResponseItems"
           label="Select Response Video"
-          @input="submitVideoNum"
+          @input="submitVideoIndex"
         />
+
+        <!-- SUBMIT SECTION -->
+        <div style="margin: 2rem">{{currentTimestamp}} s</div>
+        <v-btn @click="getCurrentTime">Get Timestamp</v-btn>
+        <v-btn @click="finalSubmission">Submit</v-btn>
       </v-col>
-      <v-col id="vue-plyrLocalhost" class="text-center">
+      <v-col md="9" id="vue-plyrLocalhost" class="text-center">
+        <v-row>
         <vue-plyr ref="plyr">
           <video
             controls
@@ -39,18 +45,21 @@
             data-plyr-config='{ "title": "Video Title" }'
           >
             <source
-              size="720"
-              :src="videoUrl"
+              :src="videoLink"
               type="video/mp4"
             />
           </video>
         </vue-plyr>
-        <!--v-btn @click="testMethod">Test Button</v-btn-->
-      </v-col>
-      <v-col>
-        <div style="margin: 2rem">{{currentTimestamp}} s</div>
-        <v-btn @click="getCurrentTime">Get Timestamp</v-btn>
-        <v-btn @click="finalSubmission">Submit</v-btn>
+        <v-btn @click="testMethod">Test Button</v-btn>
+        </v-row>
+        <v-row>
+          <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)" class="videoTile">
+            <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
+            VideoId: {{result.videoId}}
+            StartTime: {{result.startTime}}
+            KeyframeId: {{result.keyframeId}}
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
     <v-row class="text-center"></v-row>
@@ -73,8 +82,6 @@ require('nuxt-video-player/src/assets/css/main.css')
 export default {
   name: "video",
   mounted() {
-    console.log(this.$refs.plyr.player)
-    //this.$refs.plyr.player.on('event', () => console.log('event fired'))
     this.$refs.plyr.player.on("ready", this.testMethod())
   },
   components: {
@@ -84,6 +91,7 @@ export default {
     textInput: '',
     videoNum: '00032',
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/videos/00032/00032.mp4',
+    thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/00032/shot00032_1.png',
     currentTimestamp: 0,
     searchByVideoText: false,
     searchByDescription: false,
@@ -93,15 +101,36 @@ export default {
     snackbarText: '',
     snackbarColor: 'blue',
     lessItems: ['00032','00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192',],
-    queryResponseItems: []
+    queryResponseItems: [],
+    itemIndex: 0,
+    queryResults: [],
+    options: { quality: { default: '576p' }}
   }),
   methods: {
     submitVideoNum() {
-      this.getVideoUrl()
+      this.updateVideoUrl()
       this.updateVideo()
     },
-    getVideoUrl() {
-      this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
+    submitVideoIndex() {
+      //console.log('index: ',this.itemIndex)
+      //console.log('startTime: ',this.queryResults[this.itemIndex].startTime)
+      const startTime = this.queryResults[this.itemIndex].startTime
+      this.videoNum = this.queryResults[this.itemIndex].videoId
+      this.updateVideoUrl()
+      this.updateVideo(startTime)
+    },
+    updateVideoUrl(videoId = this.videoNum) {
+      this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/videos/' + videoId + '/' + videoId + '.mp4'
+      console.log('***** GET VIDEO URL *****', this.videoUrl)
+    },
+    updateThumbnailUrl(videoId, keyframeId) {
+      console.log('***** UPDATE THUMBNAIL URL *****')
+      const thumbUrl = process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + keyframeId + '.png'
+      console.log(thumbUrl)
+      return thumbUrl
+    },
+    updateThumbnailLink(videoId = this.videoNum, keyframeId = 0) {
+      return process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + keyframeId + '.png'
     },
     async searchText() {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
@@ -146,13 +175,17 @@ export default {
     },
     addVideoToList(response) {
       for (let i=0; i < response.results.length; i++) {
-        console.log(response.results[i].video_id)
         var s = response.results[i].video_id ? response.results[i].video_id+"" : response.results[i].id+"";
         while (s.length < 5) s = "0" + s;
-        if (!this.queryResponseItems.includes(s)) this.queryResponseItems = this.queryResponseItems.concat(s);
+        var item = {text: s, value: i};
+        this.queryResponseItems = this.queryResponseItems.concat(item);
+        var video = {videoId: s, startTime: response.results[i].start_time, keyframeId: response.results[i].keyframe_id.slice(response.results[i].keyframe_id.indexOf('_'), -4)};
+        this.queryResults = this.queryResults.concat(video);
       }
     },
-    updateVideo() {
+    updateVideo(videoId = this.videoNum, startTime = 0) {
+      console.log('***** UPDATE VIDEO *****', videoId, startTime)
+      this.updateVideoUrl(videoId)
       this.$refs.plyr.player.source = {
         type: 'video',
         title: 'Example title',
@@ -164,6 +197,8 @@ export default {
           },
         ],
       };
+      this.$refs.plyr.player.currentTime = 100
+      console.log('currentTime = ', this.$refs.plyr.player.currentTime)
     },
     getCurrentTime() {
       this.currentTimestamp = this.$refs.plyr.player.currentTime;
@@ -186,13 +221,21 @@ export default {
     testMethod() {
       let time = this.$refs.plyr.player.currentTime;
       console.log(time);
-      this.$refs.plyr.player.currentTime = 10 // Seeks to 10 seconds
-      //this.$refs.plyr.player.forward(10);
+      this.$refs.plyr.player.currentTime = 100
     }
+  },
+  computed: {
+    videoLink: function () {
+      return process.env.VIDEO_SOURCE_URL + '/videos/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
+    },
   }
 }
 </script>
 
 <style scoped>
+
+.videoTile {
+  max-width: 150px;
+}
 
 </style>

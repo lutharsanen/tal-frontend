@@ -47,6 +47,7 @@ export default {
   env: {
     API_URL: 'http://localhost:8000',
     VIDEO_SOURCE_URL: 'http://localhost:3001',
+    DRES_URL: 'http://localhost:8080',
   },
 
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify

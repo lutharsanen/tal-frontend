@@ -83,11 +83,13 @@ export default {
   name: "video",
   mounted() {
     this.$refs.plyr.player.on("ready", this.testMethod())
+    this.login()
   },
   components: {
     VideoPlayer
   },
   data: () => ({
+    sessionId: '',
     textInput: '',
     videoNum: '00032',
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/videos/00032/00032.mp4',
@@ -200,16 +202,33 @@ export default {
       this.$refs.plyr.player.currentTime = 100
       console.log('currentTime = ', this.$refs.plyr.player.currentTime)
     },
-    getCurrentTime() {
-      this.currentTimestamp = this.$refs.plyr.player.currentTime;
+    async login() {
+      if (localStorage.sessionId) {
+        this.sessionId = localStorage.sessionId;
+      }
+      else {
+        console.log('/api/login')
+        try {
+          let response = await this.$axios.$post(process.env.DRES_URL + '/api/login', { username: 'participant', password: 'password'})
+          console.log(response);
+          this.sessionId = response.sessionId;
+          localStorage.sessionId = response.sessionId;
+          console.log('sessionid: ', this.sessionId);
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
     },
     async finalSubmission() {
-      console.log('/submit?item=' + this.videoNum + '?timecode=' + this.convertTime(this.currentTimestamp))
+      console.log('/submit?session=/' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(this.$refs.plyr.player.currentTime))
       try {
-        let response = await this.$axios.$get('/submit?item=' + this.videoNum + '?timecode=' + this.convertTime(this.currentTimestamp))
+        let response = await this.$axios.$get(process.env.DRES_URL + '/submit?session=' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(this.$refs.plyr.player.currentTime))
         console.log(response)
-      } catch(e) {
-        console.log(e)
+        this.createSnackbar(response.description, 'green')
+      } catch (e) {
+        console.log(JSON.stringify(e.response.data))
+        this.createSnackbar(e.response.data.description, 'red')
       }
     },
     convertTime(time) {

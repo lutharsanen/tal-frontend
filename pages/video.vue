@@ -109,6 +109,11 @@ export default {
     options: { quality: { default: '576p' }}
   }),
   methods: {
+    createSnackbar(text, color = 'blue') {
+      this.snackbarText = text
+      this.snackbarColor = color
+      this.showSnackbar = true
+    },
     submitVideoNum() {
       this.updateVideoUrl()
       this.updateVideo()
@@ -136,11 +141,8 @@ export default {
     },
     async searchText() {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
-        this.snackbarText = "Please select a query."
-        this.snackbarColor = 'red'
-        this.showSnackbar = true
-      }
-      else {
+        this.createSnackbar("Please select a query.", 'red')
+      } else {
         this.queryResponseItems = [];
         if (this.searchByVideoText) {
           let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
@@ -164,14 +166,9 @@ export default {
         }
         console.log(this.queryResponseItems);
         if (this.queryResponseItems.length > 0) {
-          this.snackbarText = "Success! Select a video."
-          this.snackbarColor = 'green'
-          this.showSnackbar = true
-        }
-        else {
-          this.snackbarText = "No results."
-          this.snackbarColor = 'blue'
-          this.showSnackbar = true
+          this.createSnackbar("Success! Select a video.", 'green')
+        } else {
+          this.createSnackbar("No results.", 'blue')
         }
       }
     },

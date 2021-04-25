@@ -11,53 +11,53 @@
         <v-text-field
           v-model="textInput"
           label="Input Text"
+          @keyup.enter="searchText"
         />
         <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
         <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
         <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
         <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
         <v-btn @click="searchText">Search</v-btn>
-        <v-select
+        <!--v-select
           v-model="itemIndex"
           :items="queryResponseItems"
           label="Select Response Video"
           @input="submitVideoIndex"
-        />
+        /-->
 
         <!-- SUBMIT SECTION -->
-        <div style="margin: 2rem">{{currentTimestamp}} s</div>
-        <v-btn @click="getCurrentTime">Get Timestamp</v-btn>
         <v-btn @click="finalSubmission">Submit</v-btn>
       </v-col>
       <v-col md="9" id="vue-plyrLocalhost" class="text-center">
         <v-row>
-        <vue-plyr ref="plyr">
-          <video
-            controls
-            crossorigin
-            playsinline
-            autoplay
-            clickToPlay
-            resetOnEnd
-            muted
-            fullscreen='{ "enabled": "false" }'
-            speed='{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }'
-            data-plyr-config='{ "title": "Video Title" }'
-          >
-            <source
-              :src="videoLink"
-              type="video/mp4"
-            />
-          </video>
-        </vue-plyr>
-        <v-btn @click="testMethod">Test Button</v-btn>
+          <vue-plyr ref="plyr" @player="setPlayer">
+            <video
+              controls
+              crossorigin
+              playsinline
+              autoplay
+              clickToPlay
+              resetOnEnd
+              muted
+              fullscreen='{ "enabled": "false" }'
+              speed='{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }'
+              data-plyr-config='{ "title": "Video Title" }'
+            >
+              <source
+                :src="videoUrl"
+                type="video/mp4"
+              />
+            </video>
+          </vue-plyr>
+          <v-btn @click="testMethod">Test Button</v-btn>
         </v-row>
         <v-row>
-          <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)" class="videoTile">
+          <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
+                 class="videoTile">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
-            VideoId: {{result.videoId}}
-            StartTime: {{result.startTime}}
-            KeyframeId: {{result.keyframeId}}
+            VideoId: {{ result.videoId }}
+            StartTime: {{ result.startTime }}
+            KeyframeId: {{ result.keyframeId }}
           </v-col>
         </v-row>
       </v-col>
@@ -82,19 +82,18 @@ require('nuxt-video-player/src/assets/css/main.css')
 export default {
   name: "video",
   mounted() {
-    this.$refs.plyr.player.on("ready", this.testMethod())
     this.login()
   },
   components: {
     VideoPlayer
   },
   data: () => ({
+    player: {},
     sessionId: '',
     textInput: '',
     videoNum: '00032',
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/videos/00032/00032.mp4',
     thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/00032/shot00032_1.png',
-    currentTimestamp: 0,
     searchByVideoText: false,
     searchByDescription: false,
     searchByTitle: false,
@@ -102,11 +101,11 @@ export default {
     showSnackbar: false,
     snackbarText: '',
     snackbarColor: 'blue',
-    lessItems: ['00032','00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192',],
+    lessItems: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250'],
     queryResponseItems: [],
     itemIndex: 0,
     queryResults: [],
-    options: { quality: { default: '576p' }}
+    options: {quality: {default: '576p'}}
   }),
   methods: {
     createSnackbar(text, color = 'blue') {
@@ -114,17 +113,18 @@ export default {
       this.snackbarColor = color
       this.showSnackbar = true
     },
+    setPlayer(player) {
+      console.log('***** UPDATING PLAYER *****')
+      this.player = player
+    },
     submitVideoNum() {
-      this.updateVideoUrl()
       this.updateVideo()
     },
     submitVideoIndex() {
-      //console.log('index: ',this.itemIndex)
-      //console.log('startTime: ',this.queryResults[this.itemIndex].startTime)
       const startTime = this.queryResults[this.itemIndex].startTime
-      this.videoNum = this.queryResults[this.itemIndex].videoId
-      this.updateVideoUrl()
-      this.updateVideo(startTime)
+      const videoId = this.queryResults[this.itemIndex].videoId
+      this.videoNum = videoId
+      this.updateVideo(videoId, startTime)
     },
     updateVideoUrl(videoId = this.videoNum) {
       this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/videos/' + videoId + '/' + videoId + '.mp4'
@@ -136,14 +136,12 @@ export default {
       console.log(thumbUrl)
       return thumbUrl
     },
-    updateThumbnailLink(videoId = this.videoNum, keyframeId = 0) {
-      return process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + keyframeId + '.png'
-    },
     async searchText() {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
         this.createSnackbar("Please select a query.", 'red')
       } else {
         this.queryResponseItems = [];
+        this.queryResults = [];
         if (this.searchByVideoText) {
           let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
           console.log('SearchByVideoText: ', response1)
@@ -173,34 +171,38 @@ export default {
       }
     },
     addVideoToList(response) {
-      for (let i=0; i < response.results.length; i++) {
-        var s = response.results[i].video_id ? response.results[i].video_id+"" : response.results[i].id+"";
+      for (let i = 0; i < response.results.length; i++) {
+        var s = response.results[i].video_id ? response.results[i].video_id + "" : response.results[i].id + "";
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};
         this.queryResponseItems = this.queryResponseItems.concat(item);
-        var video = {videoId: s, startTime: response.results[i].start_time, keyframeId: response.results[i].keyframe_id.slice(response.results[i].keyframe_id.indexOf('_'), -4)};
+        var video = {
+          videoId: s,
+          startTime: response.results[i].start_time,
+          keyframeId: response.results[i].keyframe_id.slice(response.results[i].keyframe_id.indexOf('_'), -4)
+        };
         this.queryResults = this.queryResults.concat(video);
       }
     },
     updateVideo(videoId = this.videoNum, startTime = 0) {
       console.log('***** UPDATE VIDEO *****', videoId, startTime)
       this.updateVideoUrl(videoId)
-      this.$refs.plyr.player.source = {
-        type: 'video',
-        title: 'Example title',
-        sources: [
-          {
-            src: this.videoUrl,
-            type: 'video/mp4',
-            size: 720,
-          },
-        ],
-      };
-      this.$refs.plyr.player.currentTime = 100
+      this.player.source = {
+        sources:
+          [
+            {
+              src: process.env.VIDEO_SOURCE_URL + '/videos/videos/' + videoId + '/' + videoId + '.mp4',
+              type: 'video/mp4',
+              size: 720,
+            },
+          ]
+      }
+      this.$refs.plyr.player.currentTime = startTime
       console.log('currentTime = ', this.$refs.plyr.player.currentTime)
     },
     async login() {
-      if (localStorage.sessionId) {
+      this.sessionId = 'node0ho0a8qtmpc1618hp73sm34mnl0'
+      /*if (localStorage.sessionId) {
         this.sessionId = localStorage.sessionId;
       }
       else {
@@ -214,7 +216,7 @@ export default {
         } catch (e) {
           console.log(e)
         }
-      }
+      }*/
 
     },
     async finalSubmission() {
@@ -235,9 +237,9 @@ export default {
       return (hh < 10 ? '0'+hh : hh) + ':' + (mm < 10 ? '0'+mm : mm) + ':' + (ss < 10 ? '0'+ss : ss) + ':00'
     },
     testMethod() {
-      let time = this.$refs.plyr.player.currentTime;
-      console.log(time);
-      this.$refs.plyr.player.currentTime = 100
+      console.log('***TEST METHOD***');
+      this.$refs.plyr.player.forward(10)
+      console.log('current time: ', this.$refs.plyr.player.currentTime)
     }
   },
   computed: {
@@ -251,7 +253,7 @@ export default {
 <style scoped>
 
 .videoTile {
-  max-width: 150px;
+  width: 150px;
 }
 
 </style>

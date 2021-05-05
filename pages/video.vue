@@ -25,6 +25,10 @@
           </vue-plyr>
           <!--v-btn @click="testMethod">Test Button</v-btn-->
         </v-row>
+        <v-row>
+          <v-btn @click="toggleSketchpad">Sketchpad</v-btn>
+          <sketchpad v-if="this.showSketchpad"/>
+        </v-row>
         <v-row align="center" justify="center">
           <v-col class="text-center">
             <!--v-select
@@ -81,6 +85,7 @@
 
 <script>
 import VideoPlayer from 'nuxt-video-player'
+import Sketchpad from "../components/Sketchpad";
 
 require('nuxt-video-player/src/assets/css/main.css')
 
@@ -90,6 +95,7 @@ export default {
     this.login()
   },
   components: {
+    Sketchpad,
     VideoPlayer
   },
   data: () => ({
@@ -104,6 +110,7 @@ export default {
     searchByTitle: false,
     searchByTag: false,
     showSnackbar: false,
+    showSketchpad: false,
     snackbarText: '',
     snackbarColor: 'blue',
     lessItems: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250'],
@@ -117,6 +124,9 @@ export default {
       this.snackbarText = text
       this.snackbarColor = color
       this.showSnackbar = true
+    },
+    toggleSketchpad() {
+      this.showSketchpad = !this.showSketchpad
     },
     setPlayer(player) {
       console.log('***** UPDATING PLAYER *****')

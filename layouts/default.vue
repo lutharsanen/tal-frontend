@@ -61,6 +61,11 @@ export default {
           icon: 'mdi-chart-bubble',
           title: 'API Test',
           to: '/apiTest'
+        },
+        {
+          icon: 'mdi-chart-bubble',
+          title: 'Sketchpad',
+          to: '/sketchpad'
         }
       ],
       miniVariant: false,

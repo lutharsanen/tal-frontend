@@ -2,7 +2,7 @@
   <v-container style="max-width: 100%">
     <v-row>
       <v-col md="4">
-        <v-row>
+        <v-row style="height: 230px; width: 390px">
           <vue-plyr ref="plyr" @player="setPlayer">
             <video
               controls
@@ -51,7 +51,7 @@
             /-->
           </v-col>
           <v-col class="text-center">
-            <v-btn @click="finalSubmission" color="green" style="height: 200px; width: 100px">Submit</v-btn>
+            <v-btn @click="finalSubmission" color="purple" style="height: 200px; width: 100px">Submit</v-btn>
           </v-col>
         </v-row>
       </v-col>
@@ -216,7 +216,7 @@ export default {
       console.log('currentTime = ', this.$refs.plyr.player.currentTime)
     },
     async login() {
-      this.sessionId = 'node0ho0a8qtmpc1618hp73sm34mnl0'
+      this.sessionId = 'node0v26qb8f2urd4w8ce07n1u7qc1'
       /*if (localStorage.sessionId) {
         this.sessionId = localStorage.sessionId;
       }

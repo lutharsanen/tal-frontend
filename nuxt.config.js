@@ -46,6 +46,7 @@ export default {
 
   env: {
     API_URL: 'http://localhost:8000',
+    //VIDEO_SOURCE_URL: 'https://tal.diskstation.me:5006/home',
     VIDEO_SOURCE_URL: 'http://localhost:3001',
     DRES_URL: 'http://localhost:8080',
   },

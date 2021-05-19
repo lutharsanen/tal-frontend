@@ -3,7 +3,7 @@
     Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">
 
     <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
-      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
+      <td v-for="(color, index) in apiColors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
     </tr>
     <br>
     <canvas @mousedown="fillBox" id="canvasGrid"/>
@@ -22,6 +22,7 @@ export default {
     vueCanvas: null,
     canvasHeight: 300,
     canvasWidth: 500,
+    apiColors: [],
     colors: [
       { name: 'Red', rgb: 'rgb(255,0,0)' },
       { name: 'Orange', rgb: 'rgb(255, 165, 0)' },
@@ -46,7 +47,7 @@ export default {
     selectedColor: "#000",
     colorGridArray: []
   }),
-  mounted() {
+  async mounted() {
     let canvas = document.getElementById("canvasGrid")
     canvas.height = this.canvasHeight
     canvas.width = this.canvasWidth
@@ -64,10 +65,21 @@ export default {
     img.src = "https://thediyfoodie.com/wp-content/uploads/2015/10/Light-Grey-Background-Texture-4.jpg"; //transparent png
 
     //Color array
-    for (let i = 0; i < 12; i++) {
-      this.colorGridArray.push({"red": null, "green": null, "blue": null})
+    try {
+      let response = await this.$axios.$get('/api/getAllColors')
+      console.log('GetAllColors: ', response)
+      for (let k = 0; k < response.result.length; k++) {
+        this.apiColors.push({rgb: this.formatRGB(response.result[k][0], response.result[k][1], response.result[k][2])})
+      }
+      console.log('API Colors List', this.apiColors)
+    } catch (e) {
+      console.log(e);
     }
-    console.log(this.colorGridArray)
+
+    for (let i = 0; i < 12; i++) {
+      this.colorGridArray.push({"red": 0, "green": 0, "blue": 0})
+    }
+    console.log('Color Grid Array', this.colorGridArray)
   },
   methods: {
     clear() {
@@ -140,6 +152,9 @@ export default {
           green: match[2],
           blue: match[3]
         } : {};
+    },
+    formatRGB(red, green, blue) {
+      return "rgb("+ red +", " + green + ", " + blue + ")"
     },
     async query() {
       let data = {

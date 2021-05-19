@@ -1,5 +1,10 @@
 <template>
   <div>
+
+    <v-autocomplete
+      :items="objects"
+      label="Objects"
+    />
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
 
     <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
@@ -46,6 +51,7 @@ export default {
       { name: 'Gray', rgb: 'rgb(128,128,128)' },
       { name: 'Black', rgb: 'rgb(0,0,0)' },
     ],
+    objects: [],
     boxes: []
   }),
   async mounted() {
@@ -67,6 +73,18 @@ export default {
         this.apiColors.push({rgb: this.formatRGB(response.result[k][0], response.result[k][1], response.result[k][2])})
       }
       console.log('API Colors List', this.apiColors)
+    } catch (e) {
+      console.log(e);
+    }
+
+    // Objects array
+    try {
+      let response1 = await this.$axios.$get('/api/getAllObjects')
+      console.log('GetAllObjects: ', response1)
+      for (let k = 0; k < response1.result.length; k++) {
+        this.objects.push(response1.result[k])
+      }
+      console.log('Objects List', this.objects)
     } catch (e) {
       console.log(e);
     }

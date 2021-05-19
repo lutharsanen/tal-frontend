@@ -91,7 +91,7 @@ export default {
     },
     selectGridColor(e) {
       console.log(e.target.id)
-      this.selectedColor = this.colors[e.target.id].rgb
+      this.selectedColor = this.apiColors[e.target.id].rgb
     },
     fillBox(e) {
       let col, row, x, y = 0

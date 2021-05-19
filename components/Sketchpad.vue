@@ -3,7 +3,7 @@
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
 
     <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
-      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
+      <td v-for="(color, index) in apiColors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
     </tr>
     <br> <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
     <br> <v-btn @click="clear">Clear</v-btn>
@@ -24,6 +24,7 @@ export default {
     endX: 0,
     endY: 0,
     selectedColor: "#000",
+    apiColors: [],
     colors: [
       { name: 'Red', rgb: 'rgb(255,0,0)' },
       { name: 'Orange', rgb: 'rgb(255, 165, 0)' },
@@ -47,7 +48,7 @@ export default {
     ],
     boxes: []
   }),
-  mounted() {
+  async mounted() {
     let canvas = document.getElementById("canvas")
     canvas.height = this.canvasHeight
     canvas.width = this.canvasWidth
@@ -57,6 +58,18 @@ export default {
     ctx.lineWidth = 4
     ctx.lineCap = "round"
     this.vueCtx = ctx
+
+    //Color array
+    try {
+      let response = await this.$axios.$get('/api/getAllColors')
+      console.log('GetAllColors: ', response)
+      for (let k = 0; k < response.result.length; k++) {
+        this.apiColors.push({rgb: this.formatRGB(response.result[k][0], response.result[k][1], response.result[k][2])})
+      }
+      console.log('API Colors List', this.apiColors)
+    } catch (e) {
+      console.log(e);
+    }
   },
   methods: {
     startPainting(e) {
@@ -92,7 +105,7 @@ export default {
     },
     selectGridColor(e) {
       console.log(e.target.id)
-      this.selectedColor = this.colors[e.target.id].rgb
+      this.selectedColor = this.apiColors[e.target.id].rgb
     },
     calculateCoordinates(x,y) {
       // TODO: Fix coordinates scaling
@@ -101,6 +114,9 @@ export default {
       let mouseX= x - BB.left
       let mouseY= y - BB.top
       return {x: mouseX, y: mouseY}
+    },
+    formatRGB(red, green, blue) {
+      return "rgb("+ red +", " + green + ", " + blue + ")"
     }
   }
 }

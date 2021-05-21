@@ -1,9 +1,9 @@
 <template>
   <div>
-    Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">
+    <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
 
     <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
-      <td v-for="(color, index) in apiColors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
+      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
     </tr>
     <br>
     <canvas @mousedown="fillBox" id="canvasGrid"/>
@@ -17,33 +17,14 @@
 
 export default {
   name: "ColorGrid",
+  props: {
+    colors: Array
+  },
   data: () => ({
     vueCtx: null,
     vueCanvas: null,
     canvasHeight: 300,
     canvasWidth: 500,
-    apiColors: [],
-    colors: [
-      { name: 'Red', rgb: 'rgb(255,0,0)' },
-      { name: 'Orange', rgb: 'rgb(255, 165, 0)' },
-      { name: 'Yellow', rgb: 'rgb(255,255,0)' },
-      { name: 'Lime', rgb: 'rgb(0,255,0)' },
-      { name: 'Cyan', rgb: 'rgb(0,255,255)' },
-      { name: 'Blue', rgb: 'rgb(0,0,255)' },
-      { name: 'Fuchsia', rgb: 'rgb(255,0,255)' },
-      { name: 'Silver', rgb: 'rgb(192,192,192)' },
-      { name: 'White', rgb: 'rgb(255,255,255)' },
-
-      { name: 'Maroon', rgb: 'rgb(128,0,0)' },
-      { name: 'Brown', rgb: 'rgb(165, 42, 42)' },
-      { name: 'Olive', rgb: 'rgb(128,128,0)' },
-      { name: 'DarkGreen', rgb: 'rgb(0,128,0)' },
-      { name: 'Turquoise', rgb: 'rgb(0,128,128)' },
-      { name: 'DarkBlue', rgb: 'rgb(0,0,128)' },
-      { name: 'Purple', rgb: 'rgb(128,0,128)' },
-      { name: 'Gray', rgb: 'rgb(128,128,128)' },
-      { name: 'Black', rgb: 'rgb(0,0,0)' },
-    ],
     selectedColor: "#000",
     colorGridArray: []
   }),
@@ -65,17 +46,6 @@ export default {
     img.src = "https://thediyfoodie.com/wp-content/uploads/2015/10/Light-Grey-Background-Texture-4.jpg"; //transparent png
 
     //Color array
-    try {
-      let response = await this.$axios.$get('/api/getAllColors')
-      console.log('GetAllColors: ', response)
-      for (let k = 0; k < response.result.length; k++) {
-        this.apiColors.push({rgb: this.formatRGB(response.result[k][0], response.result[k][1], response.result[k][2])})
-      }
-      console.log('API Colors List', this.apiColors)
-    } catch (e) {
-      console.log(e);
-    }
-
     for (let i = 0; i < 12; i++) {
       this.colorGridArray.push({"red": 0, "green": 0, "blue": 0})
     }
@@ -91,7 +61,7 @@ export default {
     },
     selectGridColor(e) {
       console.log(e.target.id)
-      this.selectedColor = this.apiColors[e.target.id].rgb
+      this.selectedColor = this.colors[e.target.id].rgb
     },
     fillBox(e) {
       let col, row, x, y = 0
@@ -158,18 +128,18 @@ export default {
     },
     async query() {
       let data = {
-        _0: this.colorGridArray[0],
-        _1: this.colorGridArray[1],
-        _2: this.colorGridArray[2],
-        _3: this.colorGridArray[3],
-        _4: this.colorGridArray[4],
-        _5: this.colorGridArray[5],
-        _6: this.colorGridArray[6],
-        _7: this.colorGridArray[7],
-        _8: this.colorGridArray[8],
-        _9: this.colorGridArray[9],
-        _10: this.colorGridArray[10],
-        _11: this.colorGridArray[11]
+        c0: this.colorGridArray[0],
+        c1: this.colorGridArray[1],
+        c2: this.colorGridArray[2],
+        c3: this.colorGridArray[3],
+        c4: this.colorGridArray[4],
+        c5: this.colorGridArray[5],
+        c6: this.colorGridArray[6],
+        c7: this.colorGridArray[7],
+        c8: this.colorGridArray[8],
+        c9: this.colorGridArray[9],
+        c10: this.colorGridArray[10],
+        c11: this.colorGridArray[11]
       }
       console.log('****API SEARCH BY COLOR****', data)
       try {

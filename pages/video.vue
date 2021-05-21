@@ -27,11 +27,11 @@
         </v-row>
         <v-row>
           <v-btn @click="toggleColorGrid">Color Grid</v-btn>
-          <color-grid v-if="this.showColorGrid"/>
+          <color-grid v-if="this.showColorGrid" :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
         </v-row>
         <v-row>
           <v-btn @click="toggleSketchpad">Sketchpad</v-btn>
-          <sketchpad v-if="this.showSketchpad"/>
+          <sketchpad v-if="this.showSketchpad" :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
         </v-row>
         <v-row align="center" justify="center">
           <v-col class="text-center">
@@ -98,6 +98,7 @@ export default {
   name: "video",
   mounted() {
     this.login()
+    this.initColors()
   },
   components: {
     Sketchpad,
@@ -124,9 +125,22 @@ export default {
     queryResponseItems: [],
     itemIndex: 0,
     queryResults: [],
-    options: {quality: {default: '576p'}}
+    options: {quality: {default: '576p'}},
+    colors: [],
   }),
   methods: {
+    async initColors() {
+      try {
+        let response = await this.$axios.$get('/api/getAllColors')
+        console.log('GetAllColors: ', response)
+        for (let k = 0; k < response.result.length; k++) {
+          this.colors.push({rgb: "rgb(" + response.result[k][0] + ", " + response.result[k][1] + ", " + response.result[k][2] + ")"})
+        }
+        console.log('API Colors List', this.colors)
+      } catch (e) {
+        console.log(e);
+      }
+    },
     createSnackbar(text, color = 'blue') {
       this.snackbarText = text
       this.snackbarColor = color
@@ -162,6 +176,11 @@ export default {
       //console.log(thumbUrl)
       return thumbUrl
     },
+    appendQueryResults(response) {
+      console.log('response from child: ', response)
+      this.queryResults = []
+      this.addVideoToList(response);
+    },
     async searchText() {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
         this.createSnackbar("Please select a query.", 'red')
@@ -173,28 +192,40 @@ export default {
             let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
             console.log('SearchByVideoText: ', response1)
             this.addVideoToList(response1)
-          } catch (e) {console.log(e); this.createSnackbar(e.message, 'red')}
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
         }
         if (this.searchByDescription) {
           try {
-          let response2 = await this.$axios.$get('/api/searchByDescription?text=' + this.textInput)
-          console.log('SearchByDescription: ', response2)
-          this.addVideoToList(response2)
-          } catch (e) {console.log(e); this.createSnackbar(e.message, 'red')}
+            let response2 = await this.$axios.$get('/api/searchByDescription?text=' + this.textInput)
+            console.log('SearchByDescription: ', response2)
+            this.addVideoToList(response2)
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
         }
         if (this.searchByTitle) {
           try {
-          let response3 = await this.$axios.$get('/api/searchByTitle?text=' + this.textInput)
-          console.log('SearchByTitle: ', response3)
-          this.addVideoToList(response3)
-          } catch (e) {console.log(e); this.createSnackbar(e.message, 'red')}
+            let response3 = await this.$axios.$get('/api/searchByTitle?text=' + this.textInput)
+            console.log('SearchByTitle: ', response3)
+            this.addVideoToList(response3)
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
         }
         if (this.searchByTag) {
           try {
             let response4 = await this.$axios.$get('/api/searchByTag?text=' + this.textInput)
-          console.log('SearchByTag: ', response4)
-          this.addVideoToList(response4)
-          } catch (e) {console.log(e); this.createSnackbar(e.message, 'red')}
+            console.log('SearchByTag: ', response4)
+            this.addVideoToList(response4)
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
         }
         console.log(this.queryResponseItems);
         if (this.queryResponseItems.length > 0) {

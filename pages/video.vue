@@ -1,7 +1,7 @@
 <template>
   <v-container style="max-width: 100%">
     <v-row>
-      <v-col md="4">
+      <v-col md="6">
         <v-row style="height: 230px; width: 390px">
           <vue-plyr ref="plyr" @player="setPlayer">
             <video
@@ -24,6 +24,14 @@
             </video>
           </vue-plyr>
           <!--v-btn @click="testMethod">Test Button</v-btn-->
+        </v-row>
+        <v-row>
+          <v-btn @click="toggleColorGrid">Color Grid</v-btn>
+          <color-grid v-if="this.showColorGrid"/>
+        </v-row>
+        <v-row>
+          <v-btn @click="toggleSketchpad">Sketchpad</v-btn>
+          <sketchpad v-if="this.showSketchpad"/>
         </v-row>
         <v-row align="center" justify="center">
           <v-col class="text-center">
@@ -55,7 +63,7 @@
           </v-col>
         </v-row>
       </v-col>
-      <v-col md="8" id="vue-plyrLocalhost" class="text-center">
+      <v-col md="6" id="vue-plyrLocalhost" class="text-center">
         <v-row>
           <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
                  class="videoTile" style="padding: 0px">
@@ -81,6 +89,8 @@
 
 <script>
 import VideoPlayer from 'nuxt-video-player'
+import Sketchpad from "../components/Sketchpad";
+import ColorGrid from "../components/ColorGrid";
 
 require('nuxt-video-player/src/assets/css/main.css')
 
@@ -90,6 +100,8 @@ export default {
     this.login()
   },
   components: {
+    Sketchpad,
+    ColorGrid,
     VideoPlayer
   },
   data: () => ({
@@ -104,6 +116,8 @@ export default {
     searchByTitle: false,
     searchByTag: false,
     showSnackbar: false,
+    showSketchpad: false,
+    showColorGrid: false,
     snackbarText: '',
     snackbarColor: 'blue',
     lessItems: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250'],
@@ -117,6 +131,12 @@ export default {
       this.snackbarText = text
       this.snackbarColor = color
       this.showSnackbar = true
+    },
+    toggleSketchpad() {
+      this.showSketchpad = !this.showSketchpad
+    },
+    toggleColorGrid() {
+      this.showColorGrid = !this.showColorGrid
     },
     setPlayer(player) {
       console.log('***** UPDATING PLAYER *****')

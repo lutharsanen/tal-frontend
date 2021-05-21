@@ -1,5 +1,6 @@
 <template>
   <v-container style="text-align: center">
+    <sketchpad/>
     <v-card
     class="d-inline-flex flex-column align-center pa-5"
     outlined
@@ -34,8 +35,10 @@
 
 <script>
 
+import Sketchpad from "../components/Sketchpad";
 export default {
   name: "apiTest",
+  components: {Sketchpad},
   data: () => ({
     testInput: 0,
     testResult: 0,

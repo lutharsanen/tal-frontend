@@ -14,7 +14,7 @@
       fixed
       app
     >
-      <v-toolbar-title v-text="title" />
+      <img class="mr-3" src="../TALVID_Logo_inverted-removebg.png" style="max-height: 70px"/>
       <v-spacer />
       <v-btn
         v-for="(item, i) in items"
@@ -69,8 +69,7 @@ export default {
         }
       ],
       miniVariant: false,
-      right: true,
-      title: 'TAL Video Retrieval'
+      right: true
     }
   }
 }

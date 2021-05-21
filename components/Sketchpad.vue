@@ -7,17 +7,18 @@
       label="Objects"
     />
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
-
-    <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
-      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
-          @click="selectGridColor"/>
-    </tr>
+    <table>
+      <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
+        <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
+            @click="selectGridColor"/>
+      </tr>
+    </table>
     <br>
     <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
     <br>
     <v-btn @click="clear">Clear</v-btn>
     <v-btn @click="query">Query</v-btn>
-
+    <span v-if="loading">Loading...</span>
   </div>
 </template>
 
@@ -40,7 +41,8 @@ export default {
     selectedColor: "#000",
     objects: [],
     selectedObject: '',
-    boxes: []
+    boxes: [],
+    loading: false
   }),
   async mounted() {
     let canvas = document.getElementById("canvas")
@@ -56,7 +58,7 @@ export default {
     // Objects array
     try {
       // let response1 = await this.$axios.$get('/api/getAllObjects')
-      let { results } = await this.$axios.$get('/api/getAllObjects')
+      let {results} = await this.$axios.$get('/api/getAllObjects')
       console.log('GetAllObjects: ', results)
       for (let k = 0; k < results.length; k++) {
         this.objects.push(results[k])
@@ -137,6 +139,7 @@ export default {
     },
     async query() {
       console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
+      this.loading = true
       try {
         let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
         console.log('SearchByColorSketch: ', response)
@@ -151,6 +154,7 @@ export default {
         console.log(e);
         this.$emit('snackbar', e.message, 'red')
       }
+      this.loading = false
     }
   }
 }

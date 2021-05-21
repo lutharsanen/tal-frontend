@@ -1,7 +1,7 @@
 <template>
   <v-container style="max-width: 100%">
     <v-row>
-      <v-col md="6">
+      <v-col md="4">
         <v-row style="height: 230px; width: 390px">
           <vue-plyr ref="plyr" @player="setPlayer">
             <video
@@ -17,56 +17,46 @@
               data-plyr-config='{ "title": "Video Title" }'
             >
               <source
-                size="720"
                 :src="videoUrl"
                 type="video/mp4"
               />
             </video>
           </vue-plyr>
-          <!--v-btn @click="testMethod">Test Button</v-btn-->
         </v-row>
         <v-row>
-          <v-btn @click="toggleColorGrid">Color Grid</v-btn>
-          <color-grid v-if="this.showColorGrid" :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
-        </v-row>
-        <v-row>
-          <v-btn @click="toggleSketchpad">Sketchpad</v-btn>
-          <sketchpad v-if="this.showSketchpad" :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
+          <v-tabs v-model="tab" class="transparent">
+            <v-tab v-for="item in queryTabs">{{ item }}</v-tab>
+          </v-tabs>
+          <v-tabs-items v-model="tab" class="transparent">
+            <v-tab-item key="ColorGrid">
+              <color-grid :colors="colors" @query="appendQueryResults"
+                          @snackbar="createSnackbar"/>
+            </v-tab-item>
+            <v-tab-item key="Sketchpad">
+              <sketchpad :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
+            </v-tab-item>
+            <v-tab-item key="Text">
+              <v-text-field
+                v-model="textInput"
+                label="Input Text"
+                @keyup.enter="searchText"
+              />
+              <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
+              <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
+              <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
+              <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
+              <v-btn @click="searchText">Search</v-btn>
+            </v-tab-item>
+          </v-tabs-items>
         </v-row>
         <v-row align="center" justify="center">
-          <v-col class="text-center">
-            <!--v-select
-              v-model="videoNum"
-              :items="lessItems"
-              label="Select Video"
-              @input="submitVideoNum"
-            /-->
-            <v-text-field
-              v-model="textInput"
-              label="Input Text"
-              @keyup.enter="searchText"
-            />
-            <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
-            <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
-            <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
-            <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
-            <v-btn @click="searchText">Search</v-btn>
-            <!--v-select
-              v-model="itemIndex"
-              :items="queryResponseItems"
-              label="Select Response Video"
-              @input="submitVideoIndex"
-            /-->
-          </v-col>
-          <v-col class="text-center">
-            <v-btn @click="finalSubmission" color="purple" style="height: 200px; width: 100px">Submit</v-btn>
-          </v-col>
+            <v-btn @click="finalSubmission" color="purple" style="height: 70px; width: 130px">Submit</v-btn>
         </v-row>
       </v-col>
-      <v-col md="6" id="vue-plyrLocalhost" class="text-center">
+      <v-col md="8" id="vue-plyrLocalhost" class="text-center">
         <v-row>
           <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
-                 class="videoTile" style="padding: 0px">
+                 class="videoTile" style="padding: 0">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
             <!--VideoId: {{ result.videoId }}
             StartTime: {{ result.startTime }}
@@ -117,8 +107,11 @@ export default {
     searchByTitle: false,
     searchByTag: false,
     showSnackbar: false,
-    showSketchpad: false,
-    showColorGrid: false,
+    tab: null,
+    queryTabs: [
+      'Color Grid', 'Sketchpad', 'Text',
+    ],
+    text: 'I am in the tab!',
     snackbarText: '',
     snackbarColor: 'blue',
     lessItems: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250'],
@@ -131,10 +124,10 @@ export default {
   methods: {
     async initColors() {
       try {
-        let response = await this.$axios.$get('/api/getAllColors')
-        console.log('GetAllColors: ', response)
-        for (let k = 0; k < response.result.length; k++) {
-          this.colors.push({rgb: "rgb(" + response.result[k][0] + ", " + response.result[k][1] + ", " + response.result[k][2] + ")"})
+        let { results } = await this.$axios.$get('/api/getAllColors')
+        console.log('GetAllColors: ', results)
+        for (let k = 0; k < results.length; k++) {
+          this.colors.push({rgb: "rgb(" + results[k][0] + ", " + results[k][1] + ", " + results[k][2] + ")"})
         }
         console.log('API Colors List', this.colors)
       } catch (e) {
@@ -145,12 +138,6 @@ export default {
       this.snackbarText = text
       this.snackbarColor = color
       this.showSnackbar = true
-    },
-    toggleSketchpad() {
-      this.showSketchpad = !this.showSketchpad
-    },
-    toggleColorGrid() {
-      this.showColorGrid = !this.showColorGrid
     },
     setPlayer(player) {
       console.log('***** UPDATING PLAYER *****')
@@ -171,10 +158,7 @@ export default {
       console.log('***** GET VIDEO URL *****', this.videoUrl)
     },
     updateThumbnailUrl(videoId, keyframeId) {
-      //console.log('***** UPDATE THUMBNAIL URL *****')
-      const thumbUrl = process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
-      //console.log(thumbUrl)
-      return thumbUrl
+      return process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
     },
     appendQueryResults(response) {
       console.log('response from child: ', response)
@@ -320,6 +304,9 @@ export default {
 
 .videoTile {
   width: 150px;
+}
+.transparent {
+  background: transparent;
 }
 
 </style>

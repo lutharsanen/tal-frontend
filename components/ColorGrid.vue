@@ -1,15 +1,18 @@
 <template>
   <div>
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
-
-    <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
-      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
-    </tr>
+    <table>
+      <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
+        <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
+            @click="selectGridColor"/>
+      </tr>
+    </table>
     <br>
     <canvas @mousedown="fillBox" id="canvasGrid"/>
     <br>
     <v-btn @click="clear">Clear</v-btn>
     <v-btn @click="query">Query</v-btn>
+    <span v-if="loading">Loading...</span>
   </div>
 </template>
 
@@ -26,7 +29,8 @@ export default {
     canvasHeight: 300,
     canvasWidth: 500,
     selectedColor: "#000",
-    colorGridArray: []
+    colorGridArray: [],
+    loading: false
   }),
   async mounted() {
     let canvas = document.getElementById("canvasGrid")
@@ -40,7 +44,7 @@ export default {
     this.vueCtx = ctx
 
     var img = new Image();
-    img.onload = function() {
+    img.onload = function () {
       ctx.drawImage(img, 0, 0);
     }
     img.src = "https://thediyfoodie.com/wp-content/uploads/2015/10/Light-Grey-Background-Texture-4.jpg"; //transparent png
@@ -116,15 +120,15 @@ export default {
       return {x: mouseX, y: mouseY}
     },
     getRGB(str) {
-        var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
-        return match ? {
-          red: match[1],
-          green: match[2],
-          blue: match[3]
-        } : {};
+      var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
+      return match ? {
+        red: match[1],
+        green: match[2],
+        blue: match[3]
+      } : {};
     },
     formatRGB(red, green, blue) {
-      return "rgb("+ red +", " + green + ", " + blue + ")"
+      return "rgb(" + red + ", " + green + ", " + blue + ")"
     },
     async query() {
       let data = {
@@ -143,11 +147,21 @@ export default {
       }
       console.log('****API SEARCH BY COLOR****', data)
       try {
+        this.loading = true
         let response = await this.$axios.$post('/api/searchByColor', data)
         console.log('SearchByColor: ', response)
+        if (response.results.length > 0) {
+          console.log('emit query: ', response.results.length)
+          this.$emit('query', response);
+        } else {
+          console.log('emit snackbar: ', response.results.length)
+          this.$emit('snackbar', 'No results')
+        }
       } catch (e) {
         console.log(e);
+        this.$emit('snackbar', e.message, 'red')
       }
+      this.loading = false
     }
   }
 }
@@ -160,6 +174,7 @@ export default {
   width: 500px;
   background: white;
 }
+
 .colorBox {
   height: 50px;
   width: 50px;

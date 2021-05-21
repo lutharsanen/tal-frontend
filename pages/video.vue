@@ -236,15 +236,15 @@ export default {
       }
     },
     addVideoToList(response) {
-      for (let i = 0; i < response.result.length; i++) {
-        var s = response.result[i].video_id ? response.result[i].video_id + "" : response.result[i].id + "";
+      for (let i = 0; i < response.results.length; i++) {
+        var s = response.results[i].video_id ? response.results[i].video_id + "" : response.results[i].id + "";
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};
         this.queryResponseItems = this.queryResponseItems.concat(item);
         var video = {
           videoId: s,
-          startTime: response.result[i].start_time,
-          keyframeId: response.result[i].keyframe_id
+          startTime: response.results[i].start_time,
+          keyframeId: response.results[i].keyframe_id
         };
         this.queryResults = this.queryResults.concat(video);
       }

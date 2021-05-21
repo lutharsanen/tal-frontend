@@ -55,10 +55,11 @@ export default {
 
     // Objects array
     try {
-      let response1 = await this.$axios.$get('/api/getAllObjects')
-      console.log('GetAllObjects: ', response1)
-      for (let k = 0; k < response1.result.length; k++) {
-        this.objects.push(response1.result[k])
+      // let response1 = await this.$axios.$get('/api/getAllObjects')
+      let { results } = await this.$axios.$get('/api/getAllObjects')
+      console.log('GetAllObjects: ', results)
+      for (let k = 0; k < results.length; k++) {
+        this.objects.push(results[k])
       }
       console.log('Objects List', this.objects)
     } catch (e) {
@@ -139,11 +140,11 @@ export default {
       try {
         let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
         console.log('SearchByColorSketch: ', response)
-        if (response.result.length > 0) {
-          console.log('emit query: ', response.result.length)
+        if (response.results.length > 0) {
+          console.log('emit query: ', response.results.length)
           this.$emit('query', response);
         } else {
-          console.log('emit snackbar: ', response.result.length)
+          console.log('emit snackbar: ', response.results.length)
           this.$emit('snackbar', 'No results')
         }
       } catch (e) {

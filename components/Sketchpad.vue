@@ -3,21 +3,30 @@
 
     <v-autocomplete
       :items="objects"
+      v-model="selectedObject"
       label="Objects"
     />
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
 
-    <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white" >
-      <td v-for="(color, index) in apiColors" class="colorBox" :id="index" :style={backgroundColor:color.rgb} @click="selectGridColor"/>
+    <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
+      <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
+          @click="selectGridColor"/>
     </tr>
-    <br> <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
-    <br> <v-btn @click="clear">Clear</v-btn>
+    <br>
+    <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
+    <br>
+    <v-btn @click="clear">Clear</v-btn>
+    <v-btn @click="query">Query</v-btn>
+
   </div>
 </template>
 
 <script>
 export default {
   name: "Sketchpad",
+  props: {
+    colors: Array
+  },
   data: () => ({
     vueCtx: null,
     vueCanvas: null,
@@ -29,29 +38,8 @@ export default {
     endX: 0,
     endY: 0,
     selectedColor: "#000",
-    apiColors: [],
-    colors: [
-      { name: 'Red', rgb: 'rgb(255,0,0)' },
-      { name: 'Orange', rgb: 'rgb(255, 165, 0)' },
-      { name: 'Yellow', rgb: 'rgb(255,255,0)' },
-      { name: 'Lime', rgb: 'rgb(0,255,0)' },
-      { name: 'Cyan', rgb: 'rgb(0,255,255)' },
-      { name: 'Blue', rgb: 'rgb(0,0,255)' },
-      { name: 'Fuchsia', rgb: 'rgb(255,0,255)' },
-      { name: 'Silver', rgb: 'rgb(192,192,192)' },
-      { name: 'White', rgb: 'rgb(255,255,255)' },
-
-      { name: 'Maroon', rgb: 'rgb(128,0,0)' },
-      { name: 'Brown', rgb: 'rgb(165, 42, 42)' },
-      { name: 'Olive', rgb: 'rgb(128,128,0)' },
-      { name: 'DarkGreen', rgb: 'rgb(0,128,0)' },
-      { name: 'Turquoise', rgb: 'rgb(0,128,128)' },
-      { name: 'DarkBlue', rgb: 'rgb(0,0,128)' },
-      { name: 'Purple', rgb: 'rgb(128,0,128)' },
-      { name: 'Gray', rgb: 'rgb(128,128,128)' },
-      { name: 'Black', rgb: 'rgb(0,0,0)' },
-    ],
     objects: [],
+    selectedObject: '',
     boxes: []
   }),
   async mounted() {
@@ -64,18 +52,6 @@ export default {
     ctx.lineWidth = 4
     ctx.lineCap = "round"
     this.vueCtx = ctx
-
-    //Color array
-    try {
-      let response = await this.$axios.$get('/api/getAllColors')
-      console.log('GetAllColors: ', response)
-      for (let k = 0; k < response.result.length; k++) {
-        this.apiColors.push({rgb: this.formatRGB(response.result[k][0], response.result[k][1], response.result[k][2])})
-      }
-      console.log('API Colors List', this.apiColors)
-    } catch (e) {
-      console.log(e);
-    }
 
     // Objects array
     try {
@@ -108,9 +84,23 @@ export default {
       let width = this.endX - this.startX
       let height = this.endY - this.startY
       console.log('stop (', this.endX, ',', this.endY, ')');
-      this.vueCtx.strokeRect(this.startX,this.startY,width,height)
+      this.vueCtx.strokeRect(this.startX, this.startY, width, height)
       this.vueCtx.stroke()
-      this.boxes.push({label: "", x1: this.startX, y1: this.startY, x2: this.endX, y2: this.endY, color: this.selectedColor})
+      let c = this.getRGB(this.selectedColor)
+      this.boxes.push({
+        object: this.selectedObject,
+        box: {
+          x1: this.startX,
+          y1: this.startY,
+          x2: this.endX,
+          y2: this.endY
+        },
+        color: {
+          red: c.red,
+          green: c.green,
+          blue: c.blue
+        },
+      })
       console.log(this.boxes)
     },
     clear() {
@@ -123,32 +113,58 @@ export default {
     },
     selectGridColor(e) {
       console.log(e.target.id)
-      this.selectedColor = this.apiColors[e.target.id].rgb
+      this.selectedColor = this.colors[e.target.id].rgb
     },
-    calculateCoordinates(x,y) {
+    calculateCoordinates(x, y) {
       // TODO: Fix coordinates scaling
-      let BB=this.vueCanvas.getBoundingClientRect()
+      let BB = this.vueCanvas.getBoundingClientRect()
       //console.log(BB)
-      let mouseX= x - BB.left
-      let mouseY= y - BB.top
+      let mouseX = x - BB.left
+      let mouseY = y - BB.top
       return {x: mouseX, y: mouseY}
     },
+    getRGB(str) {
+      var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
+      return match ? {
+        red: match[1],
+        green: match[2],
+        blue: match[3]
+      } : {};
+    },
     formatRGB(red, green, blue) {
-      return "rgb("+ red +", " + green + ", " + blue + ")"
+      return "rgb(" + red + ", " + green + ", " + blue + ")"
+    },
+    async query() {
+      console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
+      try {
+        let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
+        console.log('SearchByColorSketch: ', response)
+        if (response.result.length > 0) {
+          console.log('emit query: ', response.result.length)
+          this.$emit('query', response);
+        } else {
+          console.log('emit snackbar: ', response.result.length)
+          this.$emit('snackbar', 'No results')
+        }
+      } catch (e) {
+        console.log(e);
+        this.$emit('snackbar', e.message, 'red')
+      }
     }
   }
 }
 </script>
 
 <style scoped>
- #canvas {
-   /* 650 x 450 ratio */
-   height: 300px;
-   width: 500px;
-   background: white;
- }
- .colorBox {
-   height: 50px;
-   width: 50px;
- }
+#canvas {
+  /* 650 x 450 ratio */
+  height: 300px;
+  width: 500px;
+  background: white;
+}
+
+.colorBox {
+  height: 50px;
+  width: 50px;
+}
 </style>

@@ -6,14 +6,14 @@
       v-model="selectedObject"
       label="Objects"
     />
+    <v-checkbox v-model="includeColor" label="Include Color"/>
     <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
-    <table>
+    <table v-if="includeColor">
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
             @click="selectGridColor"/>
       </tr>
     </table>
-    <v-checkbox v-model="includeColor" label="Include Color"/>
     <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
     <br>
     <v-btn @click="clear">Clear</v-btn>

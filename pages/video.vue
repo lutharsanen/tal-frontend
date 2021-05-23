@@ -25,7 +25,7 @@
           <video ref="vidRef" id="vidRef" controls autoplay style="width: 390px; height: 230px">
             <source :src="videoUrl" type="video/mp4">
           </video>
-          <v-btn @click="updateTime">Update Time</v-btn>
+          <!--v-btn @click="updateTime">Update Time</v-btn-->
         </v-row>
         <v-row>
           <v-tabs v-model="tab" class="transparent">

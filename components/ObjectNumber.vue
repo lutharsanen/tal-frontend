@@ -36,10 +36,10 @@ export default {
         let response = await this.$axios.$post('/api/searchByNumberObject', data)
         console.log('SearchByObjectNumber: ', response)
         if (response.results.length > 0) {
-          console.log('emit query: ', response.result.length)
+          console.log('emit query: ', response.results.length)
           this.$emit('query', response);
         } else {
-          console.log('emit snackbar: ', response.result.length)
+          console.log('emit snackbar: ', response.results.length)
           this.$emit('snackbar', 'No results')
         }
       } catch (e) {

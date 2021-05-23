@@ -26,7 +26,8 @@
 export default {
   name: "Sketchpad",
   props: {
-    colors: Array
+    colors: Array,
+    objects: Array
   },
   data: () => ({
     vueCtx: null,
@@ -39,7 +40,6 @@ export default {
     endX: 0,
     endY: 0,
     selectedColor: "#000",
-    objects: [],
     selectedObject: '',
     boxes: [],
     loading: false,
@@ -55,19 +55,6 @@ export default {
     ctx.lineWidth = 4
     ctx.lineCap = "round"
     this.vueCtx = ctx
-
-    // Objects array
-    try {
-      // let response1 = await this.$axios.$get('/api/getAllObjects')
-      let {results} = await this.$axios.$get('/api/getAllObjects')
-      console.log('GetAllObjects: ', results)
-      for (let k = 0; k < results.length; k++) {
-        this.objects.push(results[k])
-      }
-      console.log('Objects List', this.objects)
-    } catch (e) {
-      console.log(e);
-    }
   },
   methods: {
     startPainting(e) {
@@ -143,13 +130,13 @@ export default {
         console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
         this.loading = true
         try {
-          let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
-          console.log('SearchByColorSketch: ', response)
-          if (response.results.length > 0) {
-            console.log('emit query: ', response.results.length)
-            this.$emit('query', response);
+          let response1 = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
+          console.log('SearchByColorSketch: ', response1)
+          if (response1.results.length > 0) {
+            console.log('emit query: ', response1.results.length)
+            this.$emit('query', response1);
           } else {
-            console.log('emit snackbar: ', response.results.length)
+            console.log('emit snackbar: ', response1.results.length)
             this.$emit('snackbar', 'No results')
           }
         } catch (e) {
@@ -164,13 +151,13 @@ export default {
         var box = this.boxes[0].box
         var data = { object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2} }
         try {
-          let response = await this.$axios.$post('/api/searchByObjectSketch', data)
-          console.log('SearchByObjectSketch Results: ', response.results)
-          if (response.results.length > 0) {
-            console.log('emit query: ', response.results.length)
-            this.$emit('query', response);
+          let response2 = await this.$axios.$post('/api/searchByObjectSketch', data)
+          console.log('SearchByObjectSketch Results: ', response2.results)
+          if (response2.results.length > 0) {
+            console.log('emit query: ', response2.results.length)
+            this.$emit('query', response2);
           } else {
-            console.log('emit snackbar: ', response.results.length)
+            console.log('emit snackbar: ', response2.results.length)
             this.$emit('snackbar', 'No results')
           }
         } catch (e) {

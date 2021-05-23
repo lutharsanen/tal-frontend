@@ -37,7 +37,7 @@
                           @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="Sketchpad">
-              <sketchpad :colors="colors" @query="appendQueryResults" @snackbar="createSnackbar"/>
+              <sketchpad :colors="colors" :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="Text">
               <v-text-field
@@ -50,6 +50,7 @@
               <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
               <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
               <v-btn @click="searchText">Search</v-btn>
+              <span v-if="loading">Loading...</span>
             </v-tab-item>
           </v-tabs-items>
         </v-row>
@@ -93,6 +94,7 @@ export default {
   mounted() {
     this.login()
     this.initColors()
+    this.initObjects()
     //this.displayProtectedImage(process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4')
   },
   components: {
@@ -125,6 +127,8 @@ export default {
     queryResults: [],
     options: {quality: {default: '576p'}},
     colors: [],
+    objects: [],
+    loading: false
   }),
   methods: {
     async initColors() {
@@ -135,6 +139,20 @@ export default {
           this.colors.push({rgb: "rgb(" + results[k][0] + ", " + results[k][1] + ", " + results[k][2] + ")"})
         }
         console.log('API Colors List', this.colors)
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    async initObjects() {
+      // Objects array
+      try {
+        // let response1 = await this.$axios.$get('/api/getAllObjects')
+        let {results} = await this.$axios.$get('/api/getAllObjects')
+        console.log('GetAllObjects: ', results)
+        for (let k = 0; k < results.length; k++) {
+          this.objects.push(results[k])
+        }
+        console.log('Objects List', this.objects)
       } catch (e) {
         console.log(e);
       }
@@ -196,7 +214,7 @@ export default {
       this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/' + videoId + '/' + videoId + '.mp4'
       console.log('***** GET VIDEO URL *****', this.videoUrl)
     },
-    updateThumbnailUrl(videoId, keyframeId) {
+    updateThumbnailUrl(videoId, keyframeId = 1) {
       return process.env.VIDEO_SOURCE_URL + '/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
     },
     appendQueryResults(response) {
@@ -208,6 +226,7 @@ export default {
       if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
         this.createSnackbar("Please select a query.", 'red')
       } else {
+        this.loading = true
         this.queryResponseItems = [];
         this.queryResults = [];
         if (this.searchByVideoText) {
@@ -256,6 +275,7 @@ export default {
         } else {
           this.createSnackbar("No results.", 'blue')
         }
+        this.loading = false
       }
     },
     addVideoToList(response) {
@@ -264,12 +284,17 @@ export default {
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};
         this.queryResponseItems = this.queryResponseItems.concat(item);
+        var startTime = response.results[i].start_time ? response.results[i].start_time : 0;
+        var keyframeId = response.results[i].keyframe_id ? response.results[i].keyframe_id : 1
         var video = {
           videoId: s,
-          startTime: response.results[i].start_time,
-          keyframeId: response.results[i].keyframe_id
+          startTime: startTime,
+          keyframeId: keyframeId
         };
-        this.queryResults = this.queryResults.concat(video);
+        //console.log('video_id: ', video.videoId, '  exists?: ', this.queryResults.includes(video))
+        if (!this.queryResults.includes(video)) {
+          this.queryResults = this.queryResults.concat(video);
+        }
       }
     },
     updateVideo(videoId = this.videoNum, startTime = 0) {

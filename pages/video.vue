@@ -1,9 +1,9 @@
 <template>
   <v-container style="max-width: 100%">
     <v-row>
-      <v-col md="4">
-        <v-row style="height: 230px; width: 390px">
-          <vue-plyr ref="plyr" @player="setPlayer">
+      <v-col md="6">
+        <v-row>
+          <!--vue-plyr ref="plyr" @player="setPlayer">
             <video
               controls
               crossorigin
@@ -21,7 +21,11 @@
                 type="video/mp4"
               />
             </video>
-          </vue-plyr>
+          </vue-plyr-->
+          <video ref="vidRef" id="vidRef" controls autoplay style="width: 390px; height: 230px">
+            <source :src="videoUrl" type="video/mp4">
+          </video>
+          <v-btn @click="updateTime">Update Time</v-btn>
         </v-row>
         <v-row>
           <v-tabs v-model="tab" class="transparent">
@@ -53,7 +57,7 @@
           <v-btn @click="finalSubmission" color="purple" style="height: 70px; width: 130px">Submit</v-btn>
         </v-row>
       </v-col>
-      <v-col md="8" id="vue-plyrLocalhost" class="text-center">
+      <v-col md="6" id="vue-plyrLocalhost" class="text-center">
         <v-row>
           <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
                  class="videoTile" style="padding: 0">
@@ -271,7 +275,9 @@ export default {
     updateVideo(videoId = this.videoNum, startTime = 0) {
       console.log('***** UPDATE VIDEO *****', videoId, startTime)
       this.updateVideoUrl(videoId)
-      this.$refs.plyr.player.source = {
+      var vid = document.getElementById("vidRef");
+      vid.src = this.videoUrl
+      /*this.$refs.vidRef.player.source = {
         type: 'video',
         title: 'Example title',
         sources: [
@@ -281,9 +287,11 @@ export default {
             size: 720,
           },
         ],
-      };
-      this.$refs.plyr.player.currentTime = startTime
-      console.log('currentTime = ', this.$refs.plyr.player.currentTime)
+      };*/
+      vid.play()
+      console.log('currentTime = ', vid.currentTime)
+      vid.currentTime = startTime
+      console.log('currentTime = ', vid.currentTime)
     },
     async login() {
       this.sessionId = 'node0v26qb8f2urd4w8ce07n1u7qc1'
@@ -305,9 +313,10 @@ export default {
 
     },
     async finalSubmission() {
-      console.log('/submit?session=/' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(this.$refs.plyr.player.currentTime))
+      var vid = document.getElementById("vidRef");
+      console.log('/submit?session=/' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(vid.currentTime))
       try {
-        let response = await this.$axios.$get(process.env.DRES_URL + '/submit?session=' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(this.$refs.plyr.player.currentTime))
+        let response = await this.$axios.$get(process.env.DRES_URL + '/submit?session=' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(vid.currentTime))
         console.log(response)
         this.createSnackbar(response.description, 'green')
       } catch (e) {
@@ -321,10 +330,14 @@ export default {
       const hh = (time / 3600).toFixed(0).toString()
       return (hh < 10 ? '0' + hh : hh) + ':' + (mm < 10 ? '0' + mm : mm) + ':' + (ss < 10 ? '0' + ss : ss) + ':00'
     },
-    testMethod() {
+    updateTime() {
       console.log('***TEST METHOD***');
-      this.$refs.plyr.player.forward(10)
-      console.log('current time: ', this.$refs.plyr.player.currentTime)
+      var vid = document.getElementById("vidRef");
+      vid.currentTime = "10";
+      console.log(vid.currentTime);
+      vid.play();
+      //vid.currentTime = 100
+      //console.log('current time: ', vid.currentTime)
     }
   },
   computed: {

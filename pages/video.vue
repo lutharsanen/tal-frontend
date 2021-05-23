@@ -39,6 +39,9 @@
             <v-tab-item key="Sketchpad">
               <sketchpad :colors="colors" :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
             </v-tab-item>
+            <v-tab-item key="ObjectNumber">
+              <object-number :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
+            </v-tab-item>
             <v-tab-item key="Text">
               <v-text-field
                 v-model="textInput"
@@ -119,7 +122,7 @@ export default {
     showSnackbar: false,
     tab: null,
     queryTabs: [
-      'Color Grid', 'Sketchpad', 'Text',
+      'Color Grid', 'Sketchpad', 'ObjectNumber', 'Text',
     ],
     text: 'I am in the tab!',
     snackbarText: '',

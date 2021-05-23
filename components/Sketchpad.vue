@@ -13,7 +13,7 @@
             @click="selectGridColor"/>
       </tr>
     </table>
-    <br>
+    <v-checkbox v-model="includeColor" label="Include Color"/>
     <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
     <br>
     <v-btn @click="clear">Clear</v-btn>
@@ -31,8 +31,8 @@ export default {
   data: () => ({
     vueCtx: null,
     vueCanvas: null,
-    canvasHeight: 300,
-    canvasWidth: 500,
+    canvasHeight: 450,
+    canvasWidth: 650,
     painting: false,
     startX: 0,
     startY: 0,
@@ -42,7 +42,8 @@ export default {
     objects: [],
     selectedObject: '',
     boxes: [],
-    loading: false
+    loading: false,
+    includeColor: false
   }),
   async mounted() {
     let canvas = document.getElementById("canvas")
@@ -138,23 +139,47 @@ export default {
       return "rgb(" + red + ", " + green + ", " + blue + ")"
     },
     async query() {
-      console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
-      this.loading = true
-      try {
-        let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
-        console.log('SearchByColorSketch: ', response)
-        if (response.results.length > 0) {
-          console.log('emit query: ', response.results.length)
-          this.$emit('query', response);
-        } else {
-          console.log('emit snackbar: ', response.results.length)
-          this.$emit('snackbar', 'No results')
+      if (this.includeColor) {
+        console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
+        this.loading = true
+        try {
+          let response = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
+          console.log('SearchByColorSketch: ', response)
+          if (response.results.length > 0) {
+            console.log('emit query: ', response.results.length)
+            this.$emit('query', response);
+          } else {
+            console.log('emit snackbar: ', response.results.length)
+            this.$emit('snackbar', 'No results')
+          }
+        } catch (e) {
+          console.log(e);
+          this.$emit('snackbar', e.message, 'red')
         }
-      } catch (e) {
-        console.log(e);
-        this.$emit('snackbar', e.message, 'red')
+        this.loading = false
       }
-      this.loading = false
+      else {
+        console.log('****API SEARCH BY OBJECT SKETCH****', this.boxes[0])
+        this.loading = true
+        var box = this.boxes[0].box
+        var data = { object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2} }
+        try {
+          let response = await this.$axios.$post('/api/searchByObjectSketch', data)
+          console.log('SearchByObjectSketch Results: ', response.results)
+          if (response.results.length > 0) {
+            console.log('emit query: ', response.results.length)
+            this.$emit('query', response);
+          } else {
+            console.log('emit snackbar: ', response.results.length)
+            this.$emit('snackbar', 'No results')
+          }
+        } catch (e) {
+          console.log(e);
+          this.$emit('snackbar', e.message, 'red')
+        }
+        this.loading = false
+      }
+
     }
   }
 }
@@ -163,8 +188,8 @@ export default {
 <style scoped>
 #canvas {
   /* 650 x 450 ratio */
-  height: 300px;
-  width: 500px;
+  height: 450px;
+  width: 650px;
   background: white;
 }
 

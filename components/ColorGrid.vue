@@ -26,8 +26,8 @@ export default {
   data: () => ({
     vueCtx: null,
     vueCanvas: null,
-    canvasHeight: 300,
-    canvasWidth: 500,
+    canvasHeight: 450,
+    canvasWidth: 650,
     selectedColor: "#000",
     colorGridArray: [],
     loading: false
@@ -170,8 +170,8 @@ export default {
 <style scoped>
 #canvasGrid {
   /* 650 x 450 ratio */
-  height: 300px;
-  width: 500px;
+  height: 450px;
+  width: 650px;
   background: white;
 }
 

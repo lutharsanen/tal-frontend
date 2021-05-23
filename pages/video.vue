@@ -49,8 +49,10 @@
               <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
               <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
               <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
+              <v-checkbox label="Image Capture" v-model="searchByImageCapture"></v-checkbox>
               <v-btn @click="searchText">Search</v-btn>
               <span v-if="loading">Loading...</span>
+              <!--v-select :items="queryResponseItems" v-model="videoNum" @change="updateVideoUrl"/-->
             </v-tab-item>
           </v-tabs-items>
         </v-row>
@@ -113,6 +115,7 @@ export default {
     searchByDescription: false,
     searchByTitle: false,
     searchByTag: false,
+    searchByImageCapture: false,
     showSnackbar: false,
     tab: null,
     queryTabs: [
@@ -223,7 +226,7 @@ export default {
       this.addVideoToList(response);
     },
     async searchText() {
-      if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag)) {
+      if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag || this.searchByImageCapture)) {
         this.createSnackbar("Please select a query.", 'red')
       } else {
         this.loading = true
@@ -269,8 +272,17 @@ export default {
             this.createSnackbar(e.message, 'red')
           }
         }
-        console.log(this.queryResponseItems);
-        if (this.queryResponseItems.length > 0) {
+        if (this.searchByImageCapture) {
+          try {
+            let response5 = await this.$axios.$get('/api/searchByImageCapture?text=' + this.textInput)
+            console.log('SearchByImageCapture: ', response5)
+            this.addVideoToList(response5)
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
+        }
+        console.log(this.queryResponseItems);        if (this.queryResponseItems.length > 0) {
           this.createSnackbar("Success! Select a video.", 'green')
         } else {
           this.createSnackbar("No results.", 'blue')

@@ -292,6 +292,7 @@ export default {
     },
     addVideoToList(response) {
       for (let i = 0; i < response.results.length; i++) {
+        //console.log('videoId: ', response.results[i].video_id)
         var s = response.results[i].video_id ? response.results[i].video_id + "" : response.results[i].id + "";
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};

@@ -144,27 +144,106 @@ export default {
           this.$emit('snackbar', e.message, 'red')
         }
         this.loading = false
-      }
-      else {
-        console.log('****API SEARCH BY OBJECT SKETCH****', this.boxes[0])
-        this.loading = true
-        var box = this.boxes[0].box
-        var data = { object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2} }
-        try {
-          let response2 = await this.$axios.$post('/api/searchByObjectSketch', data)
-          console.log('SearchByObjectSketch Results: ', response2.results)
-          if (response2.results.length > 0) {
-            console.log('emit query: ', response2.results.length)
-            this.$emit('query', response2);
-          } else {
-            console.log('emit snackbar: ', response2.results.length)
-            this.$emit('snackbar', 'No results')
+      } else {
+        if (this.boxes.length === 1) {
+          console.log('****API SEARCH BY OBJECT SKETCH****', this.boxes[0])
+          this.loading = true
+          var box = this.boxes[0].box
+          var data = {object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2}}
+          try {
+            let response2 = await this.$axios.$post('/api/searchByObjectSketch', data)
+            console.log('SearchByObjectSketch Results: ', response2.results)
+            if (response2.results.length > 0) {
+              console.log('emit query: ', response2.results.length)
+              this.$emit('query', response2);
+            } else {
+              console.log('emit snackbar: ', response2.results.length)
+              this.$emit('snackbar', 'No results')
+            }
+          } catch (e) {
+            console.log(e);
+            this.$emit('snackbar', e.message, 'red')
           }
-        } catch (e) {
-          console.log(e);
-          this.$emit('snackbar', e.message, 'red')
+          this.loading = false
+        } else if (this.boxes.length === 2) {
+          this.loading = true
+          var boxes = this.boxes
+          var data = {
+            object1: boxes[0].object,
+            sketch1: {
+              x1: boxes[0].box.x1,
+              y1: boxes[0].box.y1,
+              x2: boxes[0].box.x2,
+              y2: boxes[0].box.y2
+            },
+            object2: boxes[1].object,
+            sketch2: {
+              x1: boxes[1].box.x1,
+              y1: boxes[1].box.y1,
+              x2: boxes[1].box.x2,
+              y2: boxes[1].box.y2
+            }
+          }
+          console.log('****API SEARCH BY TWO OBJECTS SKETCH****', data)
+
+          try {
+            let response2 = await this.$axios.$post('/api/searchByTwoObjects', data)
+            console.log('searchByTwoObjects Results: ', response2.results)
+            if (response2.results.length > 0) {
+              console.log('emit query: ', response2.results.length)
+              this.$emit('query', response2);
+            } else {
+              console.log('emit snackbar: ', response2.results.length)
+              this.$emit('snackbar', 'No results')
+            }
+          } catch (e) {
+            console.log(e);
+            this.$emit('snackbar', e.message, 'red')
+          }
+          this.loading = false
+        } else if (this.boxes.length === 3) {
+          console.log('****API SEARCH BY THREE OBJECTS SKETCH****', this.boxes[0])
+          this.loading = true
+          var boxes = this.boxes
+          var data = {
+            object1: boxes[0].object,
+            sketch1: {
+              x1: boxes[0].box.x1,
+              y1: boxes[0].box.y1,
+              x2: boxes[0].box.x2,
+              y2: boxes[0].box.y2
+            },
+            object2: boxes[1].object,
+            sketch2: {
+              x1: boxes[1].box.x1,
+              y1: boxes[1].box.y1,
+              x2: boxes[1].box.x2,
+              y2: boxes[1].box.y2
+            },
+            object3: boxes[2].object,
+            sketch3: {
+              x1: boxes[2].box.x1,
+              y1: boxes[2].box.y1,
+              x2: boxes[2].box.x2,
+              y2: boxes[2].box.y2
+            }
+          }
+          try {
+            let response2 = await this.$axios.$post('/api/searchByThreeObjects', data)
+            console.log('searchByThreeObjects Results: ', response2.results)
+            if (response2.results.length > 0) {
+              console.log('emit query: ', response2.results.length)
+              this.$emit('query', response2);
+            } else {
+              console.log('emit snackbar: ', response2.results.length)
+              this.$emit('snackbar', 'No results')
+            }
+          } catch (e) {
+            console.log(e);
+            this.$emit('snackbar', e.message, 'red')
+          }
+          this.loading = false
         }
-        this.loading = false
       }
 
     }

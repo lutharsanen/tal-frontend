@@ -10,6 +10,7 @@
       :items="numbers"
     />
     <v-btn @click="query">Query</v-btn>
+    <span v-if="loading">Loading...</span>
   </div>
 </template>
 
@@ -22,7 +23,8 @@ export default {
   data: () => ({
     selectedObject: '',
     numberOfObjects: '',
-    numbers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    numbers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    loading: false
   }),
   methods: {
     async query() {

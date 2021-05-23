@@ -25,7 +25,7 @@
         </v-row>
         <v-row>
           <v-tabs v-model="tab" class="transparent">
-            <v-tab v-for="item in queryTabs">{{ item }}</v-tab>
+            <v-tab v-for="item in queryTabs" class="transparent">{{ item }}</v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab" class="transparent">
             <v-tab-item key="ColorGrid">
@@ -50,7 +50,7 @@
           </v-tabs-items>
         </v-row>
         <v-row align="center" justify="center">
-            <v-btn @click="finalSubmission" color="purple" style="height: 70px; width: 130px">Submit</v-btn>
+          <v-btn @click="finalSubmission" color="purple" style="height: 70px; width: 130px">Submit</v-btn>
         </v-row>
       </v-col>
       <v-col md="8" id="vue-plyrLocalhost" class="text-center">
@@ -89,6 +89,7 @@ export default {
   mounted() {
     this.login()
     this.initColors()
+    //this.displayProtectedImage(process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4')
   },
   components: {
     Sketchpad,
@@ -100,8 +101,8 @@ export default {
     sessionId: '',
     textInput: '',
     videoNum: '00032',
-    videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/videos/00032/00032.mp4',
-    thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/00032/shot00032_1.png',
+    videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4',
+    thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/00032/shot00032_1.png',
     searchByVideoText: false,
     searchByDescription: false,
     searchByTitle: false,
@@ -124,7 +125,7 @@ export default {
   methods: {
     async initColors() {
       try {
-        let { results } = await this.$axios.$get('/api/getAllColors')
+        let {results} = await this.$axios.$get('/api/getAllColors')
         console.log('GetAllColors: ', results)
         for (let k = 0; k < results.length; k++) {
           this.colors.push({rgb: "rgb(" + results[k][0] + ", " + results[k][1] + ", " + results[k][2] + ")"})
@@ -143,6 +144,40 @@ export default {
       console.log('***** UPDATING PLAYER *****')
       this.player = player
     },
+    fetchWithAuthentication(url) {
+      const myHeaders = new Headers();
+      myHeaders.set("Authorization", "Basic VEFMOlRhQWRMdS4yMDIx");
+      const requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow',
+        mode: 'no-cors'
+      }
+      console.log(url, requestOptions)
+      let response = this.$axios.$get('https://tal.diskstation.me:5006/home/videos/00032/00032.mp4', {
+        method: 'GET',
+        headers: {
+          common: {
+            'Authorization': 'Basic VEFMOlRhQWRMdS4yMDIx'
+          }
+        },
+        mode: 'no-cors',
+        credentials: 'omit'
+      })
+      return response
+      //return fetch(url, { headers: {"Authorization": "Basic VEFMOlRhQWRMdS4yMDIx"} });
+    },
+    async displayProtectedImage(imageUrl) {
+      // Fetch the image.
+      const response = await this.fetchWithAuthentication(imageUrl);
+
+      // Create an object URL from the data.
+      const blob = await response.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      console.log(objectUrl)
+      // Update the source of the video.
+      //this.videoUrl = objectUrl
+    },
     submitVideoNum() {
       this.updateVideo()
     },
@@ -154,11 +189,11 @@ export default {
     },
     updateVideoUrl(videoId = this.videoNum) {
       this.videoNum = videoId
-      this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/videos/' + videoId + '/' + videoId + '.mp4'
+      this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/' + videoId + '/' + videoId + '.mp4'
       console.log('***** GET VIDEO URL *****', this.videoUrl)
     },
     updateThumbnailUrl(videoId, keyframeId) {
-      return process.env.VIDEO_SOURCE_URL + '/thumbnails/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
+      return process.env.VIDEO_SOURCE_URL + '/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
     },
     appendQueryResults(response) {
       console.log('response from child: ', response)
@@ -294,7 +329,7 @@ export default {
   },
   computed: {
     videoLink: function () {
-      return process.env.VIDEO_SOURCE_URL + '/videos/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
+      return process.env.VIDEO_SOURCE_URL + '/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
     },
   }
 }
@@ -305,6 +340,7 @@ export default {
 .videoTile {
   width: 150px;
 }
+
 .transparent {
   background: transparent;
 }

@@ -48,24 +48,9 @@ export default {
       fixed: false,
       items: [
         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
           icon: 'mdi-chart-bubble',
           title: 'Video',
           to: '/video'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'API Test',
-          to: '/apiTest'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Sketchpad',
-          to: '/sketchpad'
         }
       ],
       miniVariant: false,

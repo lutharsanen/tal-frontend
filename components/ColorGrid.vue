@@ -52,7 +52,7 @@ export default {
 
     //Color array
     for (let i = 0; i < 12; i++) {
-      this.colorGridArray.push({"red": 0, "green": 0, "blue": 0})
+      this.colorGridArray.push({"red": 255, "green": 255, "blue": 255})
     }
     console.log('Color Grid Array', this.colorGridArray)
   },

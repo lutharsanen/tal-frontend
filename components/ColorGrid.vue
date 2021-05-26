@@ -1,12 +1,12 @@
 <template>
   <div>
-    Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">
-    <table>
+    Select a color: <input v-model="hexColor" type="color" @change="selectColor">
+    <!--table>
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
             @click="selectGridColor"/>
       </tr>
-    </table>
+    </table-->
     <br>
     <canvas @mousedown="fillBox" id="canvasGrid"/>
     <br>
@@ -28,7 +28,8 @@ export default {
     vueCanvas: null,
     canvasHeight: 450,
     canvasWidth: 650,
-    selectedColor: "#000",
+    selectedColor: "",
+    hexColor: '#000',
     colorGridArray: [],
     loading: false
   }),
@@ -60,8 +61,17 @@ export default {
       this.vueCtx.clearRect(0, 0, this.vueCanvas.width, this.vueCanvas.height)
     },
     selectColor() {
-      this.selectedColor = document.getElementById("colorPicker").value
-      console.log(this.selectedColor)
+      var color = this.hexColor
+      console.log("OG color: ", color)
+      color = this.hexToRGB(color)
+      console.log(color)
+      this.selectedColor = color
+    },
+    hexToRGB(hex) {
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ?
+        "rgb(" + parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16) + ")"
+        : null;
     },
     selectGridColor(e) {
       console.log(e.target.id)

@@ -8,12 +8,12 @@
     />
     <v-checkbox v-model="includeColor" label="Include Color"/>
     <div v-if="includeColor">Select a color: <input v-model="hexColor" type="color" @change="selectColor"></div>
-    <table v-if="includeColor">
+    <!--table v-if="includeColor">
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
             @click="selectGridColor"/>
       </tr>
-    </table>
+    </table -->
     <canvas @mousedown="startPainting" @mouseup="finishedPainting" id="canvas"/>
     <br>
     <v-btn @click="clear">Clear</v-btn>
@@ -108,9 +108,9 @@ export default {
     },
     hexToRGB(hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-          rgb: "rgb(" + parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16)
-        } : null;
+        return result ?
+         "rgb(" + parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16) + ")"
+         : null;
     },
     selectGridColor(e) {
       console.log(e.target.id)
@@ -125,6 +125,7 @@ export default {
       return {x: mouseX, y: mouseY}
     },
     getRGB(str) {
+      console.log(str)
       var match = str.match(/rgb?\((\d{1,3}), ?(\d{1,3}), ?(\d{1,3})\)?(?:, ?(\d(?:\.\d?))\))?/);
       return match ? {
         red: match[1],

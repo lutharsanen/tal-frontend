@@ -28,7 +28,7 @@ export default {
     vueCanvas: null,
     canvasHeight: 450,
     canvasWidth: 650,
-    selectedColor: "",
+    selectedColor: "rgb(0,0,0)",
     hexColor: '#000',
     colorGridArray: [],
     loading: false
@@ -59,6 +59,7 @@ export default {
   methods: {
     clear() {
       this.vueCtx.clearRect(0, 0, this.vueCanvas.width, this.vueCanvas.height)
+      this.colorGridArray = []
     },
     selectColor() {
       var color = this.hexColor
@@ -174,6 +175,7 @@ export default {
         this.$emit('snackbar', e.message, 'red')
       }
       this.loading = false
+      this.colorGridArray = []
     }
   }
 }

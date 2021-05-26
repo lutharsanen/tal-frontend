@@ -3,6 +3,9 @@
     <v-row>
       <v-col md="6">
         <v-row>
+          <h2>{{this.videoNum}}</h2>
+        </v-row>
+        <v-row>
           <!--vue-plyr ref="plyr" @player="setPlayer">
             <video
               controls

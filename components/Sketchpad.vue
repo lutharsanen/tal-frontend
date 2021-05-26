@@ -39,7 +39,7 @@ export default {
     startY: 0,
     endX: 0,
     endY: 0,
-    selectedColor: "",
+    selectedColor: "rgb(0,0,0)",
     hexColor: "#000",
     selectedObject: '',
     boxes: [],

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
+    Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">
     <table>
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
@@ -153,6 +153,8 @@ export default {
         if (response.results.length > 0) {
           console.log('emit query: ', response.results.length)
           this.$emit('query', response);
+          this.$emit('snackbar', response.results.length + " results found.")
+
         } else {
           console.log('emit snackbar: ', response.results.length)
           this.$emit('snackbar', 'No results')

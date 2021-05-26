@@ -7,7 +7,7 @@
       label="Objects"
     />
     <v-checkbox v-model="includeColor" label="Include Color"/>
-    <!--Select a color: <input id="colorPicker" type="color" @change="selectColor" value="selectedColor">-->
+    <div v-if="includeColor">Select a color: <input v-model="hexColor" type="color" @change="selectColor"></div>
     <table v-if="includeColor">
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
@@ -39,7 +39,8 @@ export default {
     startY: 0,
     endX: 0,
     endY: 0,
-    selectedColor: "#000",
+    selectedColor: "",
+    hexColor: "#000",
     selectedObject: '',
     boxes: [],
     loading: false,
@@ -99,8 +100,17 @@ export default {
       this.boxes = []
     },
     selectColor() {
-      this.selectedColor = document.getElementById("colorPicker").value
-      console.log(this.selectedColor)
+      var color = this.hexColor
+      console.log("OG color: ", color)
+      color = this.hexToRGB(color)
+      console.log(color)
+      this.selectedColor = color
+    },
+    hexToRGB(hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+          rgb: "rgb(" + parseInt(result[1], 16) + ", " + parseInt(result[2], 16) + ", " + parseInt(result[3], 16)
+        } : null;
     },
     selectGridColor(e) {
       console.log(e.target.id)
@@ -135,6 +145,7 @@ export default {
           if (response1.results.length > 0) {
             console.log('emit query: ', response1.results.length)
             this.$emit('query', response1);
+            this.$emit('snackbar', response1.results.length + " results found.")
           } else {
             console.log('emit snackbar: ', response1.results.length)
             this.$emit('snackbar', 'No results')
@@ -156,6 +167,7 @@ export default {
             if (response2.results.length > 0) {
               console.log('emit query: ', response2.results.length)
               this.$emit('query', response2);
+              this.$emit('snackbar', response2.results.length + " results found.")
             } else {
               console.log('emit snackbar: ', response2.results.length)
               this.$emit('snackbar', 'No results')
@@ -192,6 +204,8 @@ export default {
             if (response2.results.length > 0) {
               console.log('emit query: ', response2.results.length)
               this.$emit('query', response2);
+              this.$emit('snackbar', response2.results.length + " results found.")
+
             } else {
               console.log('emit snackbar: ', response2.results.length)
               this.$emit('snackbar', 'No results')
@@ -234,6 +248,8 @@ export default {
             if (response2.results.length > 0) {
               console.log('emit query: ', response2.results.length)
               this.$emit('query', response2);
+              this.$emit('snackbar', response2.results.length + " results found.")
+
             } else {
               console.log('emit snackbar: ', response2.results.length)
               this.$emit('snackbar', 'No results')

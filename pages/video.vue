@@ -27,6 +27,10 @@
           </video>
           <!--v-btn @click="updateTime">Update Time</v-btn-->
         </v-row>
+        <!--v-row>
+          <v-select :items="videoList" v-model="videoNum" @change="updateVideoUrl"/>
+          <v-select :items="keyframeList" v-model="keyframe" @change="updateKeyframe"/>
+        </v-row-->
         <v-row>
           <v-tabs v-model="tab" class="transparent">
             <v-tab v-for="item in queryTabs" class="transparent">{{ item }}</v-tab>
@@ -49,6 +53,7 @@
                 @keyup.enter="searchText"
               />
               <v-checkbox label="Text in Video" v-model="searchByVideoText"></v-checkbox>
+              <v-checkbox label="Audio in Video" v-model="searchByAudio"></v-checkbox>
               <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
               <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
               <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
@@ -112,9 +117,11 @@ export default {
     sessionId: '',
     textInput: '',
     videoNum: '00032',
+    keyframe: '98',
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4',
     thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/00032/shot00032_1.png',
     searchByVideoText: false,
+    searchByAudio: false,
     searchByDescription: false,
     searchByTitle: false,
     searchByTag: false,
@@ -127,13 +134,14 @@ export default {
     text: 'I am in the tab!',
     snackbarText: '',
     snackbarColor: 'blue',
-    lessItems: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250'],
+    videoList: ['00032', '00037', '00061', '00063', '00078', '00081', '00111', '00181', '00188', '00192', '00250', '01219'],
+    keyframeList: ['0', '98', '99'],
     queryResponseItems: [],
     itemIndex: 0,
     queryResults: [],
     options: {quality: {default: '576p'}},
     colors: [],
-    objects: [],
+    objects: ['cat'],
     loading: false
   }),
   methods: {
@@ -152,7 +160,6 @@ export default {
     async initObjects() {
       // Objects array
       try {
-        // let response1 = await this.$axios.$get('/api/getAllObjects')
         let {results} = await this.$axios.$get('/api/getAllObjects')
         console.log('GetAllObjects: ', results)
         for (let k = 0; k < results.length; k++) {
@@ -220,6 +227,9 @@ export default {
       this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/' + videoId + '/' + videoId + '.mp4'
       console.log('***** GET VIDEO URL *****', this.videoUrl)
     },
+    updateKeyframe() {
+
+    },
     updateThumbnailUrl(videoId, keyframeId = 1) {
       return process.env.VIDEO_SOURCE_URL + '/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
     },
@@ -229,7 +239,7 @@ export default {
       this.addVideoToList(response);
     },
     async searchText() {
-      if (!(this.searchByVideoText || this.searchByDescription || this.searchByTitle || this.searchByTag || this.searchByImageCapture)) {
+      if (!(this.searchByVideoText || this.searchByAudio || this.searchByDescription || this.searchByTitle || this.searchByTag || this.searchByImageCapture)) {
         this.createSnackbar("Please select a query.", 'red')
       } else {
         this.loading = true
@@ -240,6 +250,16 @@ export default {
             let response1 = await this.$axios.$get('/api/searchByVideoText?text=' + this.textInput)
             console.log('SearchByVideoText: ', response1)
             this.addVideoToList(response1)
+          } catch (e) {
+            console.log(e);
+            this.createSnackbar(e.message, 'red')
+          }
+        }
+        if (this.searchByAudio) {
+          try {
+            let response11 = await this.$axios.$get('/api/searchByAudio?text=' + this.textInput)
+            console.log('SearchByAudio: ', response11)
+            this.addVideoToList(response11)
           } catch (e) {
             console.log(e);
             this.createSnackbar(e.message, 'red')
@@ -285,8 +305,9 @@ export default {
             this.createSnackbar(e.message, 'red')
           }
         }
-        console.log(this.queryResponseItems);        if (this.queryResponseItems.length > 0) {
-          this.createSnackbar("Success! Select a video.", 'green')
+        console.log(this.queryResponseItems);
+        if (this.queryResponseItems.length > 0) {
+          this.createSnackbar(this.queryResponseItems.length + " results found.", 'blue')
         } else {
           this.createSnackbar("No results.", 'blue')
         }

@@ -1,13 +1,16 @@
 <template>
   <div>
+    <div style="display: flex; flex-direction: row" >
+      <v-autocomplete
+        :items="objects"
+        v-model="selectedObject"
+        label="Objects"
+        style="width: 300px"
+      />
+      <v-checkbox v-model="includeColor" label="Include Color"/>
+        <input v-if="includeColor" v-model="hexColor" type="color" @change="selectColor" style="height: 50px; width: 50px; margin: 10px">
+    </div>
 
-    <v-autocomplete
-      :items="objects"
-      v-model="selectedObject"
-      label="Objects"
-    />
-    <v-checkbox v-model="includeColor" label="Include Color"/>
-    <div v-if="includeColor">Select a color: <input v-model="hexColor" type="color" @change="selectColor"></div>
     <!--table v-if="includeColor">
       <tr class="d-flex flex-row flex-wrap" style="max-width: 455px; border: 1px solid white">
         <td v-for="(color, index) in colors" class="colorBox" :id="index" :style={backgroundColor:color.rgb}
@@ -27,7 +30,8 @@ export default {
   name: "Sketchpad",
   props: {
     colors: Array,
-    objects: Array
+    objects: Array,
+    backgroundImage: String
   },
   data: () => ({
     vueCtx: null,
@@ -47,15 +51,7 @@ export default {
     includeColor: false
   }),
   async mounted() {
-    let canvas = document.getElementById("canvas")
-    canvas.height = this.canvasHeight
-    canvas.width = this.canvasWidth
-    this.vueCanvas = canvas
-    let ctx = canvas.getContext("2d")
-    ctx.strokeStyle = this.selectedColor
-    ctx.lineWidth = 4
-    ctx.lineCap = "round"
-    this.vueCtx = ctx
+    this.initializeCanvas()
   },
   methods: {
     startPainting(e) {
@@ -95,9 +91,27 @@ export default {
       })
       console.log(this.boxes)
     },
+    initializeCanvas() {
+      let canvas = document.getElementById("canvas")
+      canvas.height = this.canvasHeight
+      canvas.width = this.canvasWidth
+      this.vueCanvas = canvas
+      let ctx = canvas.getContext("2d")
+      ctx.strokeStyle = this.selectedColor
+      ctx.lineWidth = 4
+      ctx.lineCap = "round"
+      this.vueCtx = ctx
+
+      var img = new Image();
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+      }
+      img.src = this.backgroundImage; //transparent png
+    },
     clear() {
       this.vueCtx.clearRect(0, 0, this.vueCanvas.width, this.vueCanvas.height)
       this.boxes = []
+      this.initializeCanvas()
     },
     selectColor() {
       var color = this.hexColor

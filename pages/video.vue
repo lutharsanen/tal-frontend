@@ -3,7 +3,7 @@
     <v-row>
       <v-col md="6">
         <v-row>
-          <h2>{{this.videoNum}}</h2>
+          {{this.videoNum}}
         </v-row>
         <v-row>
           <!--vue-plyr ref="plyr" @player="setPlayer">
@@ -25,7 +25,7 @@
               />
             </video>
           </vue-plyr-->
-          <video ref="vidRef" id="vidRef" controls autoplay style="width: 390px; height: 230px">
+          <video ref="vidRef" id="vidRef" controls autoplay style="width: 430px; height: 250px">
             <source :src="videoUrl" type="video/mp4">
           </video>
           <!--v-btn @click="updateTime">Update Time</v-btn-->
@@ -40,11 +40,11 @@
           </v-tabs>
           <v-tabs-items v-model="tab" class="transparent">
             <v-tab-item key="ColorGrid">
-              <color-grid :colors="colors" @query="appendQueryResults"
+              <color-grid :colors="colors" :background-image="backgroundImage" @query="appendQueryResults"
                           @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="Sketchpad">
-              <sketchpad :colors="colors" :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
+              <sketchpad :colors="colors" :objects="objects" :background-image="backgroundImage" @query="appendQueryResults" @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="ObjectNumber">
               <object-number :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
@@ -60,7 +60,7 @@
               <v-checkbox label="Text in Title" v-model="searchByTitle"></v-checkbox>
               <v-checkbox label="Text in Description" v-model="searchByDescription"></v-checkbox>
               <v-checkbox label="Text in Tag" v-model="searchByTag"></v-checkbox>
-              <v-checkbox label="Image Capture" v-model="searchByImageCapture"></v-checkbox>
+              <v-checkbox label="Image Caption" v-model="searchByImageCapture"></v-checkbox>
               <v-btn @click="searchText">Search</v-btn>
               <span v-if="loading">Loading...</span>
               <!--v-select :items="queryResponseItems" v-model="videoNum" @change="updateVideoUrl"/-->
@@ -76,9 +76,9 @@
           <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
                  class="videoTile" style="padding: 0">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
-            <!--VideoId: {{ result.videoId }}
-            StartTime: {{ result.startTime }}
-            KeyframeId: {{ result.keyframeId }}-->
+            <!--VideoId: {{ result.videoId }}-->
+            <!--StartTime: {{ result.startTime }}-->
+            <!--KeyframeId: {{ result.keyframeId }}-->
           </v-col>
         </v-row>
       </v-col>
@@ -145,7 +145,8 @@ export default {
     options: {quality: {default: '576p'}},
     colors: [],
     objects: ['cat'],
-    loading: false
+    loading: false,
+    backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg'
   }),
   methods: {
     async initColors() {
@@ -324,6 +325,7 @@ export default {
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};
         this.queryResponseItems = this.queryResponseItems.concat(item);
+        console.log(response.results[i])
         var startTime = response.results[i].start_time ? response.results[i].start_time : 0;
         var keyframeId = response.results[i].keyframe_id ? response.results[i].keyframe_id : 1
         var video = {
@@ -331,6 +333,7 @@ export default {
           startTime: startTime,
           keyframeId: keyframeId
         };
+        console.log(video)
         //console.log('video_id: ', video.videoId, '  exists?: ', this.queryResults.includes(video))
         if (!this.queryResults.includes(video)) {
           this.queryResults = this.queryResults.concat(video);

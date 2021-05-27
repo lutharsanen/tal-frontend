@@ -21,7 +21,8 @@
 export default {
   name: "ColorGrid",
   props: {
-    colors: Array
+    colors: Array,
+    backgroundImage: String
   },
   data: () => ({
     vueCtx: null,
@@ -34,32 +35,36 @@ export default {
     loading: false
   }),
   async mounted() {
-    let canvas = document.getElementById("canvasGrid")
-    canvas.height = this.canvasHeight
-    canvas.width = this.canvasWidth
-    this.vueCanvas = canvas
-    let ctx = canvas.getContext("2d")
-    ctx.strokeStyle = this.selectedColor
-    ctx.lineWidth = 4
-    ctx.lineCap = "round"
-    this.vueCtx = ctx
-
-    var img = new Image();
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0);
-    }
-    img.src = "https://thediyfoodie.com/wp-content/uploads/2015/10/Light-Grey-Background-Texture-4.jpg"; //transparent png
-
-    //Color array
-    for (let i = 0; i < 12; i++) {
-      this.colorGridArray.push({"red": 255, "green": 255, "blue": 255})
-    }
-    console.log('Color Grid Array', this.colorGridArray)
+    this.initializeCanvas()
   },
   methods: {
+    initializeCanvas() {
+      let canvas = document.getElementById("canvasGrid")
+      canvas.height = this.canvasHeight
+      canvas.width = this.canvasWidth
+      this.vueCanvas = canvas
+      let ctx = canvas.getContext("2d")
+      ctx.strokeStyle = this.selectedColor
+      ctx.lineWidth = 4
+      ctx.lineCap = "round"
+      this.vueCtx = ctx
+
+      var img = new Image();
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0);
+      }
+      img.src = this.backgroundImage; //transparent png
+
+      //Color array
+      for (let i = 0; i < 12; i++) {
+        this.colorGridArray.push({"red": 255, "green": 255, "blue": 255})
+      }
+      console.log('Color Grid Array', this.colorGridArray)
+    },
     clear() {
       this.vueCtx.clearRect(0, 0, this.vueCanvas.width, this.vueCanvas.height)
       this.colorGridArray = []
+      this.initializeCanvas()
     },
     selectColor() {
       var color = this.hexColor

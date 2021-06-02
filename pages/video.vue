@@ -4,12 +4,19 @@
       <login-dialog :sessionId="sessionId" @submit="setSessionId" @snackbar="createSnackbar"/>
       <v-col md="6">
         <v-row>
-          {{this.videoNum}} {{this.keyframe}}
+          {{ this.videoNum }} - {{ convertTime(this.startTime) }}
         </v-row>
         <v-row>
-          <video ref="vidRef" id="vidRef" controls autoplay style="width: 430px; height: 250px">
-            <source :src="videoUrl" type="video/mp4">
-          </video>
+          <v-col>
+            <video ref="vidRef" id="vidRef" controls autoplay style="width: 430px; height: 250px">
+              <source :src="videoUrl" type="video/mp4">
+            </video>
+          </v-col>
+          <v-col style="justify-content: center; align-items: center">
+            <v-btn @click="submissionPrep" color="purple" :disabled="adhocMode" style="height: 70px; width: 130px; margin: 10px">Submit
+            </v-btn>
+            <span v-if="adhocMode">Adhoc Mode</span>
+          </v-col>
         </v-row>
         <!--v-row>
           <v-select :items="videoList" v-model="videoNum" @change="updateVideoUrl"/>
@@ -25,7 +32,8 @@
                           @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="Sketchpad">
-              <sketchpad :colors="colors" :objects="objects" :background-image="backgroundImage" @query="appendQueryResults" @snackbar="createSnackbar"/>
+              <sketchpad :colors="colors" :objects="objects" :background-image="backgroundImage"
+                         @query="appendQueryResults" @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="ObjectNumber">
               <object-number :objects="objects" @query="appendQueryResults" @snackbar="createSnackbar"/>
@@ -48,13 +56,28 @@
             </v-tab-item>
           </v-tabs-items>
         </v-row>
-        <v-row align="center" justify="center">
-          <v-btn @click="finalSubmission" color="purple" style="height: 70px; width: 130px">Submit</v-btn>
+        <v-row style="margin-top: 40px">
+          <v-switch
+            v-model="adhocMode"
+            label="Adhoc Mode"
+            style="margin: 0; padding: 0; margin-left: 10px"
+          ></v-switch>
+        </v-row>
+        <v-row>
+          <v-col v-if="adhocMode" v-for="(result, index) in submitList" @click="removeThumbnail(index)"
+                 class="videoTile" style="padding: 0; background-color: green; min-height: 100px">
+            <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)" style="width: 100px"></v-img>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-btn @click="submitMultiple" color="orange" style="height: 30px; width: 130px; margin-left: 10px">
+            Multi-Submit
+          </v-btn>
         </v-row>
       </v-col>
-      <v-col md="6" id="vue-plyrLocalhost" class="text-center">
+      <v-col md="6" class="text-center">
         <v-row>
-          <v-col v-for="result in queryResults" @click="updateVideo(result.videoId, result.startTime)"
+          <v-col v-for="result in queryResults" @click="thumbnailClick(result.videoId, result.startTime, result.keyframeId)"
                  class="videoTile" style="padding: 0">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
             <!--VideoId: {{ result.videoId }}-->
@@ -101,6 +124,7 @@ export default {
   data: () => ({
     player: {},
     sessionId: '',
+    adhocMode: false,
     textInput: '',
     videoNum: '00032',
     keyframe: '98',
@@ -130,12 +154,33 @@ export default {
     colors: [],
     objects: ['cat'],
     loading: false,
-    backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg'
+    backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg',
+    submitList: []
   }),
   methods: {
     setSessionId(id) {
       this.sessionId = id
       console.log('Session Id set to: ', id)
+    },
+    thumbnailClick(videoId, startTime, keyframeId) {
+      if (!this.adhocMode) {
+        this.updateVideo(videoId, startTime)
+      } else {
+        this.submitList.push({videoId: videoId, startTime: startTime, keyframeId: keyframeId})
+        console.log('Adhoc mode added video: ', videoId, startTime, keyframeId)
+      }
+    },
+    removeThumbnail(index) {
+      this.submitList.remove(index)
+      console.log('SubmitList after removal: ', this.submitList)
+    },
+    submitMultiple() {
+      let videos = this.submitList
+      console.log('Multi-Submit: ', videos)
+      for (let i = 0; i < videos.length; i++) {
+        this.finalSubmission(videos[i].videoNum, videos[i].startTime)
+      }
+      this.submitList = []
     },
     async initColors() {
       try {
@@ -166,44 +211,6 @@ export default {
       this.snackbarColor = color
       this.showSnackbar = true
     },
-    setPlayer(player) {
-      console.log('***** UPDATING PLAYER *****')
-      this.player = player
-    },
-    fetchWithAuthentication(url) {
-      const myHeaders = new Headers();
-      myHeaders.set("Authorization", "Basic VEFMOlRhQWRMdS4yMDIx");
-      const requestOptions = {
-        method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow',
-        mode: 'no-cors'
-      }
-      console.log(url, requestOptions)
-      let response = this.$axios.$get('https://tal.diskstation.me:5006/home/videos/00032/00032.mp4', {
-        method: 'GET',
-        headers: {
-          common: {
-            'Authorization': 'Basic VEFMOlRhQWRMdS4yMDIx'
-          }
-        },
-        mode: 'no-cors',
-        credentials: 'omit'
-      })
-      return response
-      //return fetch(url, { headers: {"Authorization": "Basic VEFMOlRhQWRMdS4yMDIx"} });
-    },
-    async displayProtectedImage(imageUrl) {
-      // Fetch the image.
-      const response = await this.fetchWithAuthentication(imageUrl);
-
-      // Create an object URL from the data.
-      const blob = await response.blob();
-      const objectUrl = URL.createObjectURL(blob);
-      console.log(objectUrl)
-      // Update the source of the video.
-      //this.videoUrl = objectUrl
-    },
     submitVideoNum() {
       this.updateVideo()
     },
@@ -217,9 +224,6 @@ export default {
       this.videoNum = videoId
       this.videoUrl = process.env.VIDEO_SOURCE_URL + '/videos/' + videoId + '/' + videoId + '.mp4'
       console.log('***** GET VIDEO URL *****', this.videoUrl)
-    },
-    updateKeyframe() {
-
     },
     updateThumbnailUrl(videoId, keyframeId = 1) {
       return process.env.VIDEO_SOURCE_URL + '/thumbnails/' + videoId + '/shot' + videoId + '_' + keyframeId + '.png'
@@ -335,12 +339,7 @@ export default {
       console.log('currentTime = ', vid.currentTime)
       vid.currentTime = startTime
       console.log('currentTime = ', vid.currentTime)
-      this.createSnackbar('Timestamp: '+ this.timeToString(startTime))
-    },
-    timeToString(time) {
-      const m = time/60
-      const s = time%60
-      return m.toFixed(0) + ':' + s.toFixed(0)
+      this.createSnackbar('Timestamp: ' + this.convertTime(startTime))
     },
     async login() {
       if (localStorage.sessionId) {
@@ -350,11 +349,19 @@ export default {
       //this.sessionId = process.env.SESSION_ID
 
     },
-    async finalSubmission() {
-      var vid = document.getElementById("vidRef");
-      console.log('/submit?session=/' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(vid.currentTime))
+    submissionPrep(video, time) {
+      if (!this.adhocMode) {
+        // Get info from video element
+        var vid = document.getElementById("vidRef");
+        time = vid.currentTime
+        video = this.videoNum
+        this.finalSubmission(video, time)
+      }
+    },
+    async finalSubmission(video = this.videoNum, time = this.startTime) {
+      console.log('/submit?session=/' + this.sessionId + '&item=' + video + '&timecode=' + this.convertTime(time))
       try {
-        let response = await this.$axios.$get(process.env.DRES_URL + '/submit?session=' + this.sessionId + '&item=' + this.videoNum + '&timecode=' + this.convertTime(vid.currentTime))
+        let response = await this.$axios.$get(process.env.DRES_URL + '/submit?session=' + this.sessionId + '&item=' + video + '&timecode=' + this.convertTime(time))
         console.log(response)
         this.createSnackbar(response.description, 'green')
       } catch (e) {
@@ -367,20 +374,6 @@ export default {
       const mm = (time / 60).toFixed(0).toString()
       const hh = (time / 3600).toFixed(0).toString()
       return (hh < 10 ? '0' + hh : hh) + ':' + (mm < 10 ? '0' + mm : mm) + ':' + (ss < 10 ? '0' + ss : ss) + ':00'
-    },
-    updateTime() {
-      console.log('***TEST METHOD***');
-      var vid = document.getElementById("vidRef");
-      vid.currentTime = "10";
-      console.log(vid.currentTime);
-      vid.play();
-      //vid.currentTime = 100
-      //console.log('current time: ', vid.currentTime)
-    }
-  },
-  computed: {
-    videoLink: function () {
-      return process.env.VIDEO_SOURCE_URL + '/videos/' + this.videoNum + '/' + this.videoNum + '.mp4'
     },
   }
 }

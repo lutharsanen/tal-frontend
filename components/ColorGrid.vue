@@ -87,7 +87,6 @@ export default {
       let wid = this.canvasWidth / 4
       let hei = this.canvasHeight / 3
       let coordinates = this.calculateCoordinates(e.clientX, e.clientY)
-      console.log('touched (', coordinates.x, ',', coordinates.y, ')');
 
       // Find column number
       if (coordinates.x < wid) {
@@ -121,10 +120,7 @@ export default {
 
       let num = row * 4 + col
       let c = this.getRGB(this.selectedColor)
-      console.log("rgb:", c)
       this.colorGridArray[num] = {"red": c.red, "green": c.green, "blue": c.blue}
-      console.log(this.colorGridArray)
-
       this.vueCtx.fillStyle = this.selectedColor
       this.vueCtx.fillRect(x, y, wid, hei)
     },

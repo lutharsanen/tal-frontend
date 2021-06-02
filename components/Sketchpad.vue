@@ -155,7 +155,8 @@ export default {
       if (this.includeColor) {
         console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
         this.loading = true
-        const payload = this.boxes[0].max_results = this.maxResults
+        const payload = this.boxes[0]
+        payload.max_results = this.maxResults
         try {
           let response1 = await this.$axios.$post('/api/searchByColorSketch', payload)
           console.log('SearchByColorSketch: ', response1)

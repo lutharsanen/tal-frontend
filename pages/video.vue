@@ -88,7 +88,7 @@ export default {
   name: "video",
   mounted() {
     this.login()
-    this.initColors()
+    //this.initColors()
     this.initObjects()
     //this.displayProtectedImage(process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4')
   },
@@ -335,7 +335,12 @@ export default {
       console.log('currentTime = ', vid.currentTime)
       vid.currentTime = startTime
       console.log('currentTime = ', vid.currentTime)
-      this.createSnackbar('Timestamp: '+ startTime)
+      this.createSnackbar('Timestamp: '+ this.timeToString(startTime))
+    },
+    timeToString(time) {
+      const m = time/60
+      const s = time%60
+      return m.toFixed(0) + ':' + s.toFixed(0)
     },
     async login() {
       if (localStorage.sessionId) {

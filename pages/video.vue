@@ -4,6 +4,31 @@
       <login-dialog :sessionId="sessionId" @submit="setSessionId" @snackbar="createSnackbar"/>
       <v-col md="6">
         <v-row>
+          <v-switch
+            v-model="manualMode"
+            label="Manual Mode"
+            style="margin: 0; padding: 0; margin-left: 10px; margin-right: 20px"
+          ></v-switch>
+          <!--MANUAL SUBMIT SECTION-->
+          <v-text-field
+            v-model="manualVid"
+            label="Video Num"
+            v-if="manualMode"
+            style="width: 50px"
+          />
+          <v-text-field
+            label="Time"
+            v-model="manualTime"
+            type="time"
+            v-if="manualMode"
+            style="width: 50px"
+          />
+          <v-btn @click="manualSubmission" v-if="manualMode"
+                 color="green" style="height: 40px; width: 150px; margin: 10px">
+            Submit Manual
+          </v-btn>
+        </v-row>
+        <v-row>
           {{ this.videoNum }} - {{ convertTime(this.startTime) }}
         </v-row>
         <v-row>
@@ -13,9 +38,11 @@
             </video>
           </v-col>
           <v-col style="justify-content: center; align-items: center">
-            <v-btn @click="submissionPrep" color="purple" :disabled="adhocMode" style="height: 70px; width: 130px; margin: 10px">Submit
+            <v-btn @click="submissionPrep" color="purple" :disabled="adhocMode || manualMode"
+                   style="height: 70px; width: 130px; margin: 10px">Submit
             </v-btn>
             <span v-if="adhocMode">Adhoc Mode</span>
+            <span v-if="manualMode">Manual Mode</span>
           </v-col>
         </v-row>
         <!--v-row>
@@ -77,7 +104,8 @@
       </v-col>
       <v-col md="6" class="text-center">
         <v-row>
-          <v-col v-for="result in queryResults" @click="thumbnailClick(result.videoId, result.startTime, result.keyframeId)"
+          <v-col v-for="result in queryResults"
+                 @click="thumbnailClick(result.videoId, result.startTime, result.keyframeId)"
                  class="videoTile" style="padding: 0">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)"></v-img>
             <!--VideoId: {{ result.videoId }}-->
@@ -125,6 +153,7 @@ export default {
     player: {},
     sessionId: '',
     adhocMode: false,
+    manualMode: false,
     textInput: '',
     videoNum: '00032',
     keyframe: '98',
@@ -155,7 +184,9 @@ export default {
     objects: ['cat'],
     loading: false,
     backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg',
-    submitList: []
+    submitList: [],
+    manualVid: '00032',
+    manualTime: "00:00:00"
   }),
   methods: {
     setSessionId(id) {
@@ -171,7 +202,7 @@ export default {
       }
     },
     removeThumbnail(index) {
-      this.submitList.remove(index)
+      this.submitList.splice(index, 1)
       console.log('SubmitList after removal: ', this.submitList)
     },
     submitMultiple() {
@@ -350,13 +381,18 @@ export default {
 
     },
     submissionPrep(video, time) {
-      if (!this.adhocMode) {
-        // Get info from video element
-        var vid = document.getElementById("vidRef");
-        time = vid.currentTime
-        video = this.videoNum
-        this.finalSubmission(video, time)
-      }
+      // Get info from video element
+      var vid = document.getElementById("vidRef");
+      time = vid.currentTime
+      video = this.videoNum
+      this.finalSubmission(video, time)
+    },
+    manualSubmission() {
+      const m = parseInt(this.manualTime.substr(0, 2))
+      const s = parseInt(this.manualTime.substr(3, 2))
+      const time = m * 60 + s
+      console.log('Manual Submission: ', this.manualVid, this.manualTime, '(', time, ')')
+      this.finalSubmission(this.manualVid, time)
     },
     async finalSubmission(video = this.videoNum, time = this.startTime) {
       console.log('/submit?session=/' + this.sessionId + '&item=' + video + '&timecode=' + this.convertTime(time))
@@ -374,7 +410,7 @@ export default {
       const mm = (time / 60).toFixed(0).toString()
       const hh = (time / 3600).toFixed(0).toString()
       return (hh < 10 ? '0' + hh : hh) + ':' + (mm < 10 ? '0' + mm : mm) + ':' + (ss < 10 ? '0' + ss : ss) + ':00'
-    },
+    }
   }
 }
 </script>

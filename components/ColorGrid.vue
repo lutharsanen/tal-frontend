@@ -22,7 +22,8 @@ export default {
   name: "ColorGrid",
   props: {
     colors: Array,
-    backgroundImage: String
+    backgroundImage: String,
+    maxResults: Number
   },
   data: () => ({
     vueCtx: null,
@@ -154,7 +155,8 @@ export default {
         c8: this.colorGridArray[8],
         c9: this.colorGridArray[9],
         c10: this.colorGridArray[10],
-        c11: this.colorGridArray[11]
+        c11: this.colorGridArray[11],
+        max_results: this.maxResults
       }
       console.log('****API SEARCH BY COLOR****', data)
       try {

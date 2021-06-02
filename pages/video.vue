@@ -50,16 +50,24 @@
           <v-select :items="keyframeList" v-model="keyframe" @change="updateKeyframe"/>
         </v-row-->
         <v-row>
+          <v-slider
+            v-model="maxResults"
+            label="Max Results"
+            step="50"
+            min="200"
+            max="10000"
+            thumb-label="always"
+          ></v-slider>
           <v-tabs v-model="tab" class="transparent">
             <v-tab v-for="item in queryTabs" class="transparent">{{ item }}</v-tab>
           </v-tabs>
           <v-tabs-items v-model="tab" class="transparent">
             <v-tab-item key="ColorGrid">
-              <color-grid :colors="colors" :background-image="backgroundImage" @query="appendQueryResults"
+              <color-grid :colors="colors" :background-image="backgroundImage" @query="appendQueryResults" :maxResults="maxResults"
                           @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="Sketchpad">
-              <sketchpad :colors="colors" :objects="objects" :background-image="backgroundImage"
+              <sketchpad :colors="colors" :objects="objects" :background-image="backgroundImage" :maxResults="maxResults"
                          @query="appendQueryResults" @snackbar="createSnackbar"/>
             </v-tab-item>
             <v-tab-item key="ObjectNumber">
@@ -186,7 +194,8 @@ export default {
     backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg',
     submitList: [],
     manualVid: '00032',
-    manualTime: "00:00:00"
+    manualTime: "00:00:00",
+    maxResults: 200,
   }),
   methods: {
     setSessionId(id) {

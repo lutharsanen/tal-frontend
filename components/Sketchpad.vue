@@ -31,7 +31,8 @@ export default {
   props: {
     colors: Array,
     objects: Array,
-    backgroundImage: String
+    backgroundImage: String,
+    maxResults: Number
   },
   data: () => ({
     vueCtx: null,
@@ -154,8 +155,9 @@ export default {
       if (this.includeColor) {
         console.log('****API SEARCH BY COLOR SKETCH****', this.boxes[0])
         this.loading = true
+        const payload = this.boxes[0].max_results = this.maxResults
         try {
-          let response1 = await this.$axios.$post('/api/searchByColorSketch', this.boxes[0])
+          let response1 = await this.$axios.$post('/api/searchByColorSketch', payload)
           console.log('SearchByColorSketch: ', response1)
           if (response1.results.length > 0) {
             console.log('emit query: ', response1.results.length)
@@ -175,7 +177,7 @@ export default {
           console.log('****API SEARCH BY OBJECT SKETCH****', this.boxes[0])
           this.loading = true
           var box = this.boxes[0].box
-          var data = {object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2}}
+          var data = {object: this.boxes[0].object, sketch: {x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2}, max_results: this.maxResults}
           try {
             let response2 = await this.$axios.$post('/api/searchByObjectSketch', data)
             console.log('SearchByObjectSketch Results: ', response2.results)
@@ -209,7 +211,8 @@ export default {
               y1: boxes[1].box.y1,
               x2: boxes[1].box.x2,
               y2: boxes[1].box.y2
-            }
+            },
+            max_results: this.maxResults
           }
           console.log('****API SEARCH BY TWO OBJECTS SKETCH****', data)
 
@@ -255,7 +258,8 @@ export default {
               y1: boxes[2].box.y1,
               x2: boxes[2].box.x2,
               y2: boxes[2].box.y2
-            }
+            },
+            max_results: this.maxResults
           }
           try {
             let response2 = await this.$axios.$post('/api/searchByThreeObjects', data)

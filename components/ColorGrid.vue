@@ -59,7 +59,6 @@ export default {
       for (let i = 0; i < 12; i++) {
         this.colorGridArray.push({"red": 255, "green": 255, "blue": 255})
       }
-      console.log('Color Grid Array', this.colorGridArray)
     },
     clear() {
       this.vueCtx.clearRect(0, 0, this.vueCanvas.width, this.vueCanvas.height)

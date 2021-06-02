@@ -1,34 +1,15 @@
 <template>
   <v-container style="max-width: 100%">
     <v-row>
+      <login-dialog :sessionId="sessionId" @submit="setSessionId" @snackbar="createSnackbar"/>
       <v-col md="6">
         <v-row>
-          {{this.videoNum}}
+          {{this.videoNum}} {{this.keyframe}}
         </v-row>
         <v-row>
-          <!--vue-plyr ref="plyr" @player="setPlayer">
-            <video
-              controls
-              crossorigin
-              playsinline
-              autoplay
-              clickToPlay
-              resetOnEnd
-              muted
-              fullscreen='{ "enabled": "false" }'
-              speed='{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }'
-              data-plyr-config='{ "title": "Video Title" }'
-            >
-              <source
-                :src="videoUrl"
-                type="video/mp4"
-              />
-            </video>
-          </vue-plyr-->
           <video ref="vidRef" id="vidRef" controls autoplay style="width: 430px; height: 250px">
             <source :src="videoUrl" type="video/mp4">
           </video>
-          <!--v-btn @click="updateTime">Update Time</v-btn-->
         </v-row>
         <!--v-row>
           <v-select :items="videoList" v-model="videoNum" @change="updateVideoUrl"/>
@@ -99,6 +80,7 @@
 import VideoPlayer from 'nuxt-video-player'
 import Sketchpad from "../components/Sketchpad";
 import ColorGrid from "../components/ColorGrid";
+import LoginDialog from "../components/LoginDialog";
 
 require('nuxt-video-player/src/assets/css/main.css')
 
@@ -111,6 +93,7 @@ export default {
     //this.displayProtectedImage(process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4')
   },
   components: {
+    LoginDialog,
     Sketchpad,
     ColorGrid,
     VideoPlayer
@@ -121,6 +104,7 @@ export default {
     textInput: '',
     videoNum: '00032',
     keyframe: '98',
+    startTime: 0,
     videoUrl: process.env.VIDEO_SOURCE_URL + '/videos/00032/00032.mp4',
     thumbnailUrl: process.env.VIDEO_SOURCE_URL + '/thumbnails/00032/shot00032_1.png',
     searchByVideoText: false,
@@ -149,6 +133,10 @@ export default {
     backgroundImage: 'https://banner2.cleanpng.com/20180224/jrw/kisspng-white-black-angle-pattern-floating-dot-background-with-snowflakes-stock-vect-5a914aca6c6064.3090225015194713064439.jpg'
   }),
   methods: {
+    setSessionId(id) {
+      this.sessionId = id
+      console.log('Session Id set to: ', id)
+    },
     async initColors() {
       try {
         let {results} = await this.$axios.$get('/api/getAllColors')
@@ -156,7 +144,6 @@ export default {
         for (let k = 0; k < results.length; k++) {
           this.colors.push({rgb: "rgb(" + results[k][0] + ", " + results[k][1] + ", " + results[k][2] + ")"})
         }
-        console.log('API Colors List', this.colors)
       } catch (e) {
         console.log(e);
       }
@@ -325,7 +312,6 @@ export default {
         while (s.length < 5) s = "0" + s;
         var item = {text: s, value: i};
         this.queryResponseItems = this.queryResponseItems.concat(item);
-        console.log(response.results[i])
         var startTime = response.results[i].start_time ? response.results[i].start_time : 0;
         var keyframeId = response.results[i].keyframe_id ? response.results[i].keyframe_id : 1
         var video = {
@@ -333,7 +319,6 @@ export default {
           startTime: startTime,
           keyframeId: keyframeId
         };
-        console.log(video)
         //console.log('video_id: ', video.videoId, '  exists?: ', this.queryResults.includes(video))
         if (!this.queryResults.includes(video)) {
           this.queryResults = this.queryResults.concat(video);
@@ -343,41 +328,21 @@ export default {
     updateVideo(videoId = this.videoNum, startTime = 0) {
       console.log('***** UPDATE VIDEO *****', videoId, startTime)
       this.updateVideoUrl(videoId)
+      this.startTime = startTime
       var vid = document.getElementById("vidRef");
       vid.src = this.videoUrl
-      /*this.$refs.vidRef.player.source = {
-        type: 'video',
-        title: 'Example title',
-        sources: [
-          {
-            src: this.videoUrl,
-            type: 'video/mp4',
-            size: 720,
-          },
-        ],
-      };*/
       vid.play()
       console.log('currentTime = ', vid.currentTime)
       vid.currentTime = startTime
       console.log('currentTime = ', vid.currentTime)
+      this.createSnackbar('Timestamp: '+ startTime)
     },
     async login() {
-      this.sessionId = 'node0v26qb8f2urd4w8ce07n1u7qc1'
-      /*if (localStorage.sessionId) {
+      if (localStorage.sessionId) {
         this.sessionId = localStorage.sessionId;
       }
-      else {
-        console.log('/api/login')
-        try {
-          let response = await this.$axios.$post(process.env.DRES_URL + '/api/login', { username: 'participant', password: 'password'})
-          console.log(response);
-          this.sessionId = response.sessionId;
-          localStorage.sessionId = response.sessionId;
-          console.log('sessionid: ', this.sessionId);
-        } catch (e) {
-          console.log(e)
-        }
-      }*/
+      console.log('Session Id set to: ', this.sessionId)
+      //this.sessionId = process.env.SESSION_ID
 
     },
     async finalSubmission() {

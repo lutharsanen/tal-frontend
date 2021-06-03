@@ -1,0 +1,93 @@
+task,group,team,resultName,score
+KIS-V Task 1,KIS Visual,VIDRET,n/a,0.0
+KIS-V Task 1,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 1,KIS Visual,Post-Impressionism,n/a,0.0
+KIS-V Task 1,KIS Visual,TALVID,n/a,0.0
+KIS-T Task 1,KIS Textual,VIDRET,n/a,0.0
+KIS-T Task 1,KIS Textual,VIVID,n/a,0.0
+KIS-T Task 1,KIS Textual,Post-Impressionism,n/a,0.0
+KIS-T Task 1,KIS Textual,TALVID,n/a,7.581190476190471
+AVS Task 1,Ad-Hoc Video Search,VIDRET,n/a,50.0
+AVS Task 1,Ad-Hoc Video Search,VIVID,n/a,26.47058823529412
+AVS Task 1,Ad-Hoc Video Search,Post-Impressionism,n/a,3.125
+AVS Task 1,Ad-Hoc Video Search,TALVID,n/a,0.0
+KIS-V Task 2,KIS Visual,VIDRET,n/a,0.0
+KIS-V Task 2,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 2,KIS Visual,Post-Impressionism,n/a,0.0
+KIS-V Task 2,KIS Visual,TALVID,n/a,0.0
+KIS-T Task 2,KIS Textual,VIDRET,n/a,0.0
+KIS-T Task 2,KIS Textual,VIVID,n/a,0.0
+KIS-T Task 2,KIS Textual,Post-Impressionism,n/a,0.0
+KIS-T Task 2,KIS Textual,TALVID,n/a,66.35869047619047
+AVS Task 2,Ad-Hoc Video Search,VIDRET,n/a,28.125
+AVS Task 2,Ad-Hoc Video Search,VIVID,n/a,9.523809523809524
+AVS Task 2,Ad-Hoc Video Search,Post-Impressionism,n/a,10.227272727272727
+AVS Task 2,Ad-Hoc Video Search,TALVID,n/a,8.695652173913043
+KIS-V Task 3,KIS Visual,VIDRET,n/a,83.19666666666666
+KIS-V Task 3,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 3,KIS Visual,Post-Impressionism,n/a,0.0
+KIS-V Task 3,KIS Visual,TALVID,n/a,52.12416666666667
+KIS-T Task 3,KIS Textual,VIDRET,n/a,0.0
+KIS-T Task 3,KIS Textual,VIVID,n/a,0.0
+KIS-T Task 3,KIS Textual,Post-Impressionism,n/a,0.0
+KIS-T Task 3,KIS Textual,TALVID,n/a,0.0
+AVS Task 3,Ad-Hoc Video Search,VIDRET,n/a,3.3333333333333335
+AVS Task 3,Ad-Hoc Video Search,VIVID,n/a,38.850574712643684
+AVS Task 3,Ad-Hoc Video Search,Post-Impressionism,n/a,11.904761904761905
+AVS Task 3,Ad-Hoc Video Search,TALVID,n/a,44.11764705882353
+KIS-V Task 4,KIS Visual,VIDRET,n/a,89.27083333333334
+KIS-V Task 4,KIS Visual,VIVID,n/a,89.20183333333333
+KIS-V Task 4,KIS Visual,Post-Impressionism,n/a,0.0
+KIS-V Task 4,KIS Visual,TALVID,n/a,0.0
+KIS-T Task 4,KIS Textual,VIDRET,n/a,0.0
+KIS-T Task 4,KIS Textual,VIVID,n/a,0.0
+KIS-T Task 4,KIS Textual,Post-Impressionism,n/a,94.76809523809524
+KIS-T Task 4,KIS Textual,TALVID,n/a,76.78761904761905
+AVS Task 4,Ad-Hoc Video Search,VIDRET,n/a,33.3381398702235
+AVS Task 4,Ad-Hoc Video Search,VIVID,n/a,16.240601503759397
+AVS Task 4,Ad-Hoc Video Search,Post-Impressionism,n/a,11.65991902834008
+AVS Task 4,Ad-Hoc Video Search,TALVID,n/a,57.37316263632053
+KIS-V Task 5,KIS Visual,VIDRET,n/a,0.0
+KIS-V Task 5,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 5,KIS Visual,Post-Impressionism,n/a,77.02516666666666
+KIS-V Task 5,KIS Visual,TALVID,n/a,83.01650000000001
+KIS-T Task 5,KIS Textual,VIDRET,n/a,0.0
+KIS-T Task 5,KIS Textual,VIVID,n/a,80.46607142857142
+KIS-T Task 5,KIS Textual,Post-Impressionism,n/a,0.0
+KIS-T Task 5,KIS Textual,TALVID,n/a,0.0
+AVS Task 5,Ad-Hoc Video Search,VIDRET,n/a,1.228878648233487
+AVS Task 5,Ad-Hoc Video Search,VIVID,n/a,55.381464413722476
+AVS Task 5,Ad-Hoc Video Search,Post-Impressionism,n/a,1.4336917562724014
+AVS Task 5,Ad-Hoc Video Search,TALVID,n/a,45.752097365000594
+KIS-V Task 6,KIS Visual,VIDRET,n/a,0.0
+KIS-V Task 6,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 6,KIS Visual,Post-Impressionism,n/a,55.39233333333334
+KIS-V Task 6,KIS Visual,TALVID,n/a,0.0
+KIS-T Task 6,KIS Textual,VIDRET,n/a,94.45285714285714
+KIS-T Task 6,KIS Textual,VIVID,n/a,30.608452380952386
+KIS-T Task 6,KIS Textual,Post-Impressionism,n/a,0.0
+KIS-T Task 6,KIS Textual,TALVID,n/a,0.0
+AVS Task 6,Ad-Hoc Video Search,VIDRET,n/a,5.595375722543352
+AVS Task 6,Ad-Hoc Video Search,VIVID,n/a,57.58093842438058
+AVS Task 6,Ad-Hoc Video Search,Post-Impressionism,n/a,11.65392504195413
+AVS Task 6,Ad-Hoc Video Search,TALVID,n/a,24.277456647398843
+KIS-V Task 7,KIS Visual,VIDRET,n/a,0.0
+KIS-V Task 7,KIS Visual,VIVID,n/a,0.0
+KIS-V Task 7,KIS Visual,Post-Impressionism,n/a,60.73316666666666
+KIS-V Task 7,KIS Visual,TALVID,n/a,0.0
+KIS-T Task 7,KIS Textual,VIDRET,n/a,7.0582142857142856
+KIS-T Task 7,KIS Textual,VIVID,n/a,84.11035714285714
+KIS-T Task 7,KIS Textual,Post-Impressionism,n/a,50.71809523809523
+KIS-T Task 7,KIS Textual,TALVID,n/a,24.282857142857154
+AVS Task 7,Ad-Hoc Video Search,VIDRET,n/a,34.76733977172959
+AVS Task 7,Ad-Hoc Video Search,VIVID,n/a,25.959192149940296
+AVS Task 7,Ad-Hoc Video Search,Post-Impressionism,n/a,9.6524064171123
+AVS Task 7,Ad-Hoc Video Search,TALVID,n/a,43.85663356251592
+KIS-T Task 8,KIS Textual,VIDRET,n/a,88.00261904761905
+KIS-T Task 8,KIS Textual,VIVID,n/a,88.12488095238095
+KIS-T Task 8,KIS Textual,Post-Impressionism,n/a,51.354642857142856
+KIS-T Task 8,KIS Textual,TALVID,n/a,31.162738095238097
+AVS Task 8,Ad-Hoc Video Search,VIDRET,n/a,9.713453132588636
+AVS Task 8,Ad-Hoc Video Search,VIVID,n/a,21.12676056338028
+AVS Task 8,Ad-Hoc Video Search,Post-Impressionism,n/a,3.0046948356807515
+AVS Task 8,Ad-Hoc Video Search,TALVID,n/a,59.01547901269001

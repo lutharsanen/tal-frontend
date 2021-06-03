@@ -23,6 +23,9 @@
             v-if="manualMode"
             style="width: 50px"
           />
+          <v-btn @click="updateVideo(manualVid, reverseConvertTime(manualTime))" v-if="manualMode" color="yellow" style="height: 40px; width: 150px; margin: 10px">
+            Update Video
+          </v-btn>
           <v-btn @click="manualSubmission" v-if="manualMode"
                  color="green" style="height: 40px; width: 150px; margin: 10px">
             Submit Manual
@@ -397,10 +400,14 @@ export default {
       video = this.videoNum
       this.finalSubmission(video, time)
     },
-    manualSubmission() {
+    reverseConvertTime() {
       const m = parseInt(this.manualTime.substr(0, 2))
       const s = parseInt(this.manualTime.substr(3, 2))
       const time = m * 60 + s
+      return time
+    },
+    manualSubmission() {
+      const time = this.reverseConvertTime()
       console.log('Manual Submission: ', this.manualVid, this.manualTime, '(', time, ')')
       this.finalSubmission(this.manualVid, time)
     },

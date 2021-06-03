@@ -49,7 +49,7 @@ export default {
     //VIDEO_SOURCE_URL: 'https://tal.diskstation.me:5006/home',
     VIDEO_SOURCE_URL: 'http://localhost:3001',
     //DRES_URL: 'http://localhost:8080',
-    DRES_URL: 'https://test.interactivevideoretrieval.com',
+    DRES_URL: 'https://interactivevideoretrieval.com',
     SESSION_ID: 'node01ksg4tc07axvjwaektrfoo33m58'
   },
 

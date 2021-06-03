@@ -102,6 +102,7 @@
           <v-col v-if="adhocMode" v-for="(result, index) in submitList" @click="removeThumbnail(index)"
                  class="videoTile" style="padding: 0; background-color: green; min-height: 100px">
             <v-img :src="updateThumbnailUrl(result.videoId, result.keyframeId)" style="width: 100px"></v-img>
+            {{ result.videoId }} {{ convertTime(result.startTime) }}
           </v-col>
         </v-row>
         <v-row>
